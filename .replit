@@ -21,22 +21,17 @@ args = "Start Game"
 name = "Start Game"
 author = "agent"
 
+[workflows.workflow.metadata]
+outputType = "webview"
+
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run start"
 waitForPort = 5000
 
-[workflows.workflow.metadata]
-outputType = "webview"
-
 [[ports]]
 localPort = 5000
 externalPort = 80
-
-[[ports]]
-localPort = 8000
-externalPort = 8000
-exposeLocalhost = true
 
 [[ports]]
 localPort = 8001
@@ -44,6 +39,6 @@ externalPort = 3000
 
 [deployment]
 deploymentTarget = "autoscale"
-build = ["npm install && npm run build"]
+build = ["npm", "run", "build"]
 publicDir = "public"
-run = ["node", "replit_serve.js", "serve"]
+run = ["node", "./dist/index.cjs"]
