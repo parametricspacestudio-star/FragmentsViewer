@@ -184,7 +184,7 @@ async function Init ()
         fragments.settings.autoCoordinate = false;
         
         const ifcImporter = new FRAGS.IfcImporter();
-        ifcImporter.wasm = { absolute: true, path: "https://unpkg.com/web-ifc@0.0.66/" };
+        ifcImporter.wasm = { absolute: true, path: "https://unpkg.com/web-ifc@0.0.72/" };
 
         world.camera.controls.addEventListener ('rest', () => fragments.update ());
         world.camera.controls.addEventListener ('update', () => fragments.update ());
@@ -268,7 +268,12 @@ async function Init ()
                                 progressBar.SetText('Converting IFC...');
                                 const buffer = await file.arrayBuffer();
                                 const ifcBytes = new Uint8Array(buffer);
-                                const fragmentBytes = await ifcImporter.process(ifcBytes);
+                                const fragmentBytes = await ifcImporter.process({
+                                    bytes: ifcBytes,
+                                    progressCallback: (progress, data) => {
+                                        progressBar.SetText(`Converting IFC... ${Math.round(progress * 100)}%`);
+                                    },
+                                });
                                 await LoadModelFromBuffer(fragmentBytes.buffer as ArrayBuffer, world, fragments);
                             } catch (error) {
                                 console.error("Error converting IFC:", error);
