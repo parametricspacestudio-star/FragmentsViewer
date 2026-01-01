@@ -21,7 +21,8 @@ if (isServeMode) {
     await context.watch();
     
     let { host: esHost, port: esPort } = await context.serve({
-        servedir: 'public'
+        servedir: 'public',
+        host: '127.0.0.1'
     });
 
     const app = express();

@@ -184,7 +184,7 @@ async function Init ()
         fragments.settings.autoCoordinate = false;
         
         const ifcImporter = new FRAGS.IfcImporter();
-        // Use a consistent unpkg URL for both WASM and dependency versioning
+        // Use unpkg with version 0.0.70 - ensure it's a direct link to the WASM file or directory
         const wasmPath = "https://unpkg.com/web-ifc@0.0.70/";
         ifcImporter.wasm = { absolute: true, path: wasmPath };
         
@@ -192,7 +192,6 @@ async function Init ()
             const anyImporter = ifcImporter as any;
             
             // Re-initialize settings with the mandatory fields
-            // Ensure we are setting them on the correct object path
             anyImporter.settings = {
                 webIfc: {
                     COORDINATE_SYSTEM: 2,
@@ -201,6 +200,13 @@ async function Init ()
                 },
                 autoCoordinate: true
             };
+            
+            // Ensure we handle the case where settings might be a getter/setter or needs manual override
+            Object.defineProperty(anyImporter, 'settings', {
+                value: anyImporter.settings,
+                writable: true,
+                configurable: true
+            });
             
             console.log("IFC Importer initialized with mandatory settings", anyImporter.settings);
         };
