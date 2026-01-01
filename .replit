@@ -39,6 +39,6 @@ externalPort = 8000
 
 [deployment]
 deploymentTarget = "autoscale"
-build = ["npm", "run", "build"]
+build = ["npm install && npm run build"]
 publicDir = "public"
-run = ["node", "./dist/index.cjs"]
+run = ["node", "replit_serve.js", "serve"]
