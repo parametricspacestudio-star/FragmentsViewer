@@ -40,5 +40,5 @@ externalPort = 8000
 [deployment]
 deploymentTarget = "autoscale"
 build = ["npm", "run", "build"]
+run = ["http-server", "public", "-p", "5000"]
 publicDir = "public"
-run = ["node", "./dist/index.cjs"]
