@@ -28,17 +28,21 @@ class ProgressBar
 
 async function FitModelToWindow (world: OBC.World, fragments: FRAGS.FragmentsModels)
 {
-        let model = fragments.models.list.get (ModelIdentifier);
-        if (model === undefined || world.camera.controls === undefined) {
+        if (fragments.models.list.size === 0 || world.camera.controls === undefined) {
                 return;
         }
 
-        let boxes = await model.getBoxes ();
-        let boxMinMaxPoints = [];
-        for (let box of boxes) {
-                boxMinMaxPoints.push (box.min);
-                boxMinMaxPoints.push (box.max);
+        let boxMinMaxPoints: THREE.Vector3[] = [];
+        for (const model of fragments.models.list.values()) {
+            const boxes = await model.getBoxes();
+            for (const box of boxes) {
+                boxMinMaxPoints.push(box.min);
+                boxMinMaxPoints.push(box.max);
+            }
         }
+        
+        if (boxMinMaxPoints.length === 0) return;
+
         let boundingBox = new THREE.Box3 ().setFromPoints (boxMinMaxPoints);
         let boundingSphere = boundingBox.getBoundingSphere (new THREE.Sphere ());
 
@@ -79,14 +83,10 @@ function IsCompressedBuffer (buffer: ArrayBuffer) : boolean
 async function LoadModelInternal (buffer: ArrayBuffer, world: OBC.World, fragments: FRAGS.FragmentsModels)
 {
         try {
-                // Clear existing models before loading new ones
-                await fragments.disposeModel(ModelIdentifier);
-                
                 const isCompressed = IsCompressedBuffer(buffer);
                 console.log("Loading model, compressed:", isCompressed, "buffer size:", buffer.byteLength);
 
                 const model = await fragments.load (buffer, {
-                        modelId: ModelIdentifier,
                         raw: !isCompressed
                 });
                 
@@ -114,7 +114,6 @@ async function LoadModelInternal (buffer: ArrayBuffer, world: OBC.World, fragmen
 
 async function LoadModelFromBuffer (buffer: ArrayBuffer, world: OBC.World, fragments: FRAGS.FragmentsModels)
 {
-        await fragments.disposeModel (ModelIdentifier);
         fragments.update (true);
 
         const progressBar = new ProgressBar ();
@@ -125,7 +124,6 @@ async function LoadModelFromBuffer (buffer: ArrayBuffer, world: OBC.World, fragm
 
 async function LoadModelFromUrl (url: string, world: OBC.World, fragments: FRAGS.FragmentsModels)
 {
-        await fragments.disposeModel (ModelIdentifier);
         fragments.update (true);
 
         const progressBar = new ProgressBar ();
