@@ -57,17 +57,25 @@ async function LoadModelInternal(buffer: ArrayBuffer, world: OBC.World, fragment
             raw: !isCompressed
         });
         world.scene.three.add(model.object);
-        model.object.traverse((child: any) => {
+        model.object.traverse((child: THREE.Object3D) => {
             if (child instanceof THREE.Mesh && child.material) {
-                if (Array.isArray(child.material)) child.material.forEach((m: any) => m.side = THREE.DoubleSide);
-                else child.material.side = THREE.DoubleSide;
+                if (Array.isArray(child.material)) {
+                    for (const m of child.material) {
+                        m.side = THREE.DoubleSide;
+                    }
+                } else {
+                    child.material.side = THREE.DoubleSide;
+                }
             }
         });
-        const indexer = components.get((OBC as any).IfcRelationsIndexer);
+        
+        const indexer = components.get(OBCF.IfcRelationsIndexer);
         const classifier = components.get(OBC.Classifier);
-        if (indexer && (indexer as any).process) await (indexer as any).process(model);
-        if (classifier && (classifier as any).bySpatialStructure) await (classifier as any).bySpatialStructure(model);
-        if (classifier && (classifier as any).byEntity) await (classifier as any).byEntity(model);
+        
+        await indexer.process(model);
+        await classifier.bySpatialStructure(model);
+        await classifier.byEntity(model);
+        
         updateClassificationUI();
         await FitModelToWindow(world, fragments);
         fragments.update(true);
@@ -90,6 +98,13 @@ async function LoadModelFromBuffer(buffer: ArrayBuffer, world: OBC.World, fragme
 async function Init() {
     const components = new OBC.Components();
     components.init();
+
+    // Register essential components
+    components.add(OBCF.IfcRelationsIndexer);
+    components.add(OBC.Classifier);
+    components.add(OBC.FragmentsManager);
+    components.add(OBC.Worlds);
+
     const worlds = components.get(OBC.Worlds);
     const world = worlds.create<OBC.SimpleScene, OBC.SimpleCamera, OBC.SimpleRenderer>();
     world.scene = new OBC.SimpleScene(components);
@@ -101,8 +116,8 @@ async function Init() {
     world.camera.controls.setLookAt(100, 100, 100, 0, 0, 0);
     const grids = components.get(OBC.Grids);
     grids.create(world);
-    const highlighter = components.get(OBCF.Highlighter as any);
-    if ((highlighter as any).setup) (highlighter as any).setup({ world });
+    const highlighter = components.get(OBCF.Highlighter);
+    highlighter.setup({ world });
 
     const workerUrl = 'https://cdn.jsdelivr.net/npm/@thatopen/fragments@3.0.6/dist/Worker/worker.mjs';
     const fragments = new FRAGS.FragmentsModels(workerUrl);
@@ -115,57 +130,53 @@ async function Init() {
     const classificationTree = document.createElement("bim-tree") as any;
 
     updateClassificationUI = () => {
-        const classifier = components.get(OBC.Classifier as any);
-        if (!classifier) return;
+        const classifier = components.get(OBC.Classifier);
         const treeData: any[] = [];
-        const classifierList = (classifier as any).list;
-        if (classifierList) {
-            for (const [name, classification] of Object.entries(classifierList)) {
-                const modelNodes: any[] = [];
-                for (const modelID in (classification as any)) {
-                    const model = fragments.models.list.get(modelID);
-                    const modelName = (model as any)?.name || "Unnamed Model";
-                    const groupNode = { label: modelName, children: [] as any[] };
-                    const map = (classification as any)[modelID];
-                    for (const label in map) {
-                        const expressIDs = map[label];
-                        const children = Array.from(expressIDs as any).map((id: any) => ({
-                            label: `Element ${id}`,
-                            data: { modelID, expressID: id }
-                        }));
-                        groupNode.children.push({ label, children });
-                    }
-                    modelNodes.push(groupNode);
+        const classifierList = classifier.list;
+        for (const [name, classification] of Object.entries(classifierList)) {
+            const modelNodes: any[] = [];
+            for (const modelID in (classification as any)) {
+                const model = fragments.models.list.get(modelID);
+                const modelName = (model as any)?.name || "Unnamed Model";
+                const groupNode = { label: modelName, children: [] as any[] };
+                const map = (classification as any)[modelID];
+                for (const label in map) {
+                    const expressIDs = map[label];
+                    const children = Array.from(expressIDs as any).map((id: any) => ({
+                        label: `Element ${id}`,
+                        data: { modelID, expressID: id }
+                    }));
+                    groupNode.children.push({ label, children });
                 }
-                treeData.push({ label: name, children: modelNodes });
+                modelNodes.push(groupNode);
             }
+            treeData.push({ label: name, children: modelNodes });
         }
         classificationTree.data = treeData;
     };
 
     const updateUI = async () => {
-        const selection = (highlighter as any).selection?.select;
+        const highlighterComp = components.get(OBCF.Highlighter);
+        const selection = (highlighterComp.selection as any).select;
         if (!selection || Object.keys(selection).length === 0) {
             propsTable.data = [];
             return;
         }
-        const indexer = components.get((OBC as any).IfcRelationsIndexer);
+        const indexer = components.get(OBCF.IfcRelationsIndexer);
         const fragmentsManager = components.get(OBC.FragmentsManager);
         const allProps: any[] = [];
         for (const fragID in selection) {
-            const frag = fragmentsManager.list.get(fragID);
+            const frag = (fragmentsManager.list as any).get(fragID);
             if (!frag) continue;
-            const model = (frag as any).group;
+            const model = frag.group;
             for (const expressID of selection[fragID]) {
-                const props = await (model as any).getProperties(expressID);
+                const props = await model.getProperties(expressID);
                 if (props) allProps.push(props);
-                if (indexer && (indexer as any).getEntityRelations) {
-                    const psets = (indexer as any).getEntityRelations(model, expressID, "IsDefinedBy");
-                    if (psets) {
-                        for (const psetID of psets) {
-                            const psetProps = await (model as any).getProperties(psetID);
-                            if (psetProps) allProps.push(psetProps);
-                        }
+                const psets = (indexer as any).getEntityRelations(model, expressID, "IsDefinedBy");
+                if (psets) {
+                    for (const psetID of psets) {
+                        const psetProps = await model.getProperties(psetID);
+                        if (psetProps) allProps.push(psetProps);
                     }
                 }
             }
@@ -173,9 +184,9 @@ async function Init() {
         propsTable.data = allProps;
     };
 
-    const highlighterEvents = (highlighter as any).events;
-    if (highlighterEvents && highlighterEvents.select) highlighterEvents.select.on(() => updateUI());
-    if (highlighterEvents && highlighterEvents.clear) highlighterEvents.clear.on(() => updateUI());
+    const highlighterEvents = components.get(OBCF.Highlighter);
+    (highlighterEvents.events as any).select.add(() => updateUI());
+    (highlighterEvents.events as any).clear.add(() => updateUI());
 
     classificationTree.addEventListener("item-selected", (event: any) => {
         const node = event.detail.item;
@@ -183,7 +194,8 @@ async function Init() {
             const { modelID, expressID } = node.data;
             const model = fragments.models.list.get(modelID);
             if (model) {
-                (highlighter as any).selection.select = {
+                const highlighterComp = components.get(OBCF.Highlighter);
+                (highlighterComp.selection as any).select = {
                     [(model as any).uuid || (model as any).id]: new Set([expressID])
                 };
             }
@@ -215,16 +227,16 @@ async function Init() {
             fileInput.click();
         };
         const onToggleVisibility = () => {
-            const selection = (highlighter as any).selection?.select;
-            const fragmentsManager = components.get(OBC.FragmentsManager);
+            const highlighterComp = components.get(OBCF.Highlighter);
+            const selection = (highlighterComp.selection as any).select;
             if (!selection) return;
             for (const fragID in selection) {
-                const frag = fragmentsManager.list.get(fragID);
+                const fragmentsManager = components.get(OBC.FragmentsManager);
+                const frag = (fragmentsManager.list as any).get(fragID);
                 if (!frag) continue;
                 for (const id of selection[fragID]) {
                     const hidden = (frag as any).hiddenItems.has(id);
-                    if ((frag as any).setVisible) (frag as any).setVisible(!hidden, [id]);
-                    else if ((frag as any).setVisibility) (frag as any).setVisibility(!hidden, [id]);
+                    (frag as any).setVisible([id], !hidden);
                 }
             }
         };
