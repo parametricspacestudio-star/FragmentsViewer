@@ -186,14 +186,34 @@ async function Init ()
         const ifcImporter = new FRAGS.IfcImporter();
         ifcImporter.wasm = { absolute: true, path: "https://unpkg.com/web-ifc@0.0.72/" };
         
-        // Settings are set on the instance directly or via a specific method in newer versions
-        // In @thatopen/fragments 3.1.6, we should check if these exist or use default
-        try {
-            (ifcImporter as any).settings.webIfc.COORDINATE_SYSTEM = 2;
-            (ifcImporter as any).settings.autoCoordinate = true;
-        } catch (e) {
-            console.warn("Could not set ifcImporter settings, using defaults");
-        }
+        // Use a more stable way to set settings for @thatopen/fragments 3.1.6
+        const setupIfcImporter = () => {
+            const settings = (ifcImporter as any).settings;
+            if (settings && settings.webIfc) {
+                settings.webIfc.COORDINATE_SYSTEM = 2;
+                // Add the missing field that web-ifc 0.0.72+ might expect
+                if (settings.webIfc.TOLERANCE_PLANE_INTERSECTION === undefined) {
+                    settings.webIfc.TOLERANCE_PLANE_INTERSECTION = 0.0001;
+                }
+                settings.autoCoordinate = true;
+                console.log("IFC Importer settings applied successfully");
+            } else {
+                console.warn("Could not find ifcImporter settings structure, attempting direct assignment");
+                try {
+                    (ifcImporter as any).settings = {
+                        webIfc: {
+                            COORDINATE_SYSTEM: 2,
+                            TOLERANCE_PLANE_INTERSECTION: 0.0001
+                        },
+                        autoCoordinate: true
+                    };
+                } catch (e) {
+                    console.error("Failed to set IFC settings:", e);
+                }
+            }
+        };
+
+        setupIfcImporter();
 
         world.camera.controls.addEventListener ('rest', () => fragments.update ());
         world.camera.controls.addEventListener ('update', () => fragments.update ());
