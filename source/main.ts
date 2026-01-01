@@ -3,8 +3,6 @@ import * as OBC from '@thatopen/components';
 import * as FRAGS from '@thatopen/fragments';
 import * as BUI from "@thatopen/ui";
 
-const ModelIdentifier = 'model';
-
 class ProgressBar
 {
         progressDiv: HTMLElement;
@@ -87,7 +85,7 @@ async function LoadModelInternal (buffer: ArrayBuffer, world: OBC.World, fragmen
                 console.log("Loading model, compressed:", isCompressed, "buffer size:", buffer.byteLength);
 
                 const model = await fragments.load (buffer, {
-                        modelId: OBC.Components.uuid(),
+                        modelId: THREE.MathUtils.generateUUID(),
                         raw: !isCompressed
                 });
                 
