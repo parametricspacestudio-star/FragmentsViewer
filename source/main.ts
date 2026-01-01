@@ -185,6 +185,15 @@ async function Init ()
         
         const ifcImporter = new FRAGS.IfcImporter();
         ifcImporter.wasm = { absolute: true, path: "https://unpkg.com/web-ifc@0.0.72/" };
+        
+        // Settings are set on the instance directly or via a specific method in newer versions
+        // In @thatopen/fragments 3.1.6, we should check if these exist or use default
+        try {
+            (ifcImporter as any).settings.webIfc.COORDINATE_SYSTEM = 2;
+            (ifcImporter as any).settings.autoCoordinate = true;
+        } catch (e) {
+            console.warn("Could not set ifcImporter settings, using defaults");
+        }
 
         world.camera.controls.addEventListener ('rest', () => fragments.update ());
         world.camera.controls.addEventListener ('update', () => fragments.update ());
@@ -267,17 +276,27 @@ async function Init ()
                             try {
                                 progressBar.SetText('Converting IFC...');
                                 const buffer = await file.arrayBuffer();
+                                console.log("IFC Buffer size:", buffer.byteLength);
                                 const ifcBytes = new Uint8Array(buffer);
+                                
+                                if (!ifcImporter.wasm.path) {
+                                    console.error("IFC Importer WASM path not set");
+                                }
+
                                 const fragmentBytes = await ifcImporter.process({
                                     bytes: ifcBytes,
                                     progressCallback: (progress, data) => {
                                         progressBar.SetText(`Converting IFC... ${Math.round(progress * 100)}%`);
+                                        console.log("IFC Conversion progress:", progress);
                                     },
                                 });
+                                console.log("IFC Conversion successful, fragment size:", fragmentBytes.buffer.byteLength);
                                 await LoadModelFromBuffer(fragmentBytes.buffer as ArrayBuffer, world, fragments);
-                            } catch (error) {
+                            } catch (error: any) {
                                 console.error("Error converting IFC:", error);
-                                alert("Failed to convert IFC. Please ensure it is a valid .ifc file.");
+                                if (error.message) console.error("Error message:", error.message);
+                                if (error.stack) console.error("Error stack:", error.stack);
+                                alert(`Failed to convert IFC: ${error.message || "Unknown error"}. Please ensure it is a valid .ifc file.`);
                             } finally {
                                 progressBar.Hide();
                             }
