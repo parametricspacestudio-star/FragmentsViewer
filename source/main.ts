@@ -87,6 +87,7 @@ async function LoadModelInternal (buffer: ArrayBuffer, world: OBC.World, fragmen
                 console.log("Loading model, compressed:", isCompressed, "buffer size:", buffer.byteLength);
 
                 const model = await fragments.load (buffer, {
+                        modelId: OBC.Components.uuid(),
                         raw: !isCompressed
                 });
                 
