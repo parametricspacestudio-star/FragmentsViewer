@@ -184,33 +184,25 @@ async function Init ()
         fragments.settings.autoCoordinate = false;
         
         const ifcImporter = new FRAGS.IfcImporter();
-        ifcImporter.wasm = { absolute: true, path: "https://unpkg.com/web-ifc@0.0.72/" };
+        // Use a consistent unpkg URL for both WASM and dependency versioning
+        const wasmPath = "https://unpkg.com/web-ifc@0.0.70/";
+        ifcImporter.wasm = { absolute: true, path: wasmPath };
         
-        // Use a more stable way to set settings for @thatopen/fragments 3.1.6
         const setupIfcImporter = () => {
-            const settings = (ifcImporter as any).settings;
-            if (settings && settings.webIfc) {
-                settings.webIfc.COORDINATE_SYSTEM = 2;
-                // Add the missing field that web-ifc 0.0.72+ might expect
-                if (settings.webIfc.TOLERANCE_PLANE_INTERSECTION === undefined) {
-                    settings.webIfc.TOLERANCE_PLANE_INTERSECTION = 0.0001;
-                }
-                settings.autoCoordinate = true;
-                console.log("IFC Importer settings applied successfully");
-            } else {
-                console.warn("Could not find ifcImporter settings structure, attempting direct assignment");
-                try {
-                    (ifcImporter as any).settings = {
-                        webIfc: {
-                            COORDINATE_SYSTEM: 2,
-                            TOLERANCE_PLANE_INTERSECTION: 0.0001
-                        },
-                        autoCoordinate: true
-                    };
-                } catch (e) {
-                    console.error("Failed to set IFC settings:", e);
-                }
-            }
+            const anyImporter = ifcImporter as any;
+            
+            // Re-initialize settings with the mandatory fields
+            // Ensure we are setting them on the correct object path
+            anyImporter.settings = {
+                webIfc: {
+                    COORDINATE_SYSTEM: 2,
+                    TOLERANCE_PLANE_INTERSECTION: 0.0001,
+                    COORDINATE_TO_ORIGIN: true
+                },
+                autoCoordinate: true
+            };
+            
+            console.log("IFC Importer initialized with mandatory settings", anyImporter.settings);
         };
 
         setupIfcImporter();
