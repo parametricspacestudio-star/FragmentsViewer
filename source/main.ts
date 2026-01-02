@@ -52,7 +52,7 @@ async function init() {
     const sceneComponent = new OBC.SimpleScene(components);
     sceneComponent.setup();
     world.scene = sceneComponent;
-    world.scene.three.background = null;
+    world.scene.three.background = new THREE.Color(0xffffff);
 
     const container = document.getElementById('container')!;
     const viewport = document.createElement('bim-viewport');
