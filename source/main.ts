@@ -52,7 +52,7 @@ async function init() {
     const sceneComponent = new OBC.SimpleScene(components);
     sceneComponent.setup();
     world.scene = sceneComponent;
-    world.scene.three.background = null;
+    world.scene.three.background = new THREE.Color(0xf0f0f0);
 
     const container = document.getElementById('container')!;
     const viewport = document.createElement('bim-viewport');
@@ -75,7 +75,21 @@ async function init() {
     // 4. Initialize components and add grid
     components.init();
     const grids = components.get(OBC.Grids);
-    grids.create(world);
+    const grid = grids.create(world);
+    // ShaderMaterial uses uniforms for properties like color
+    if (grid.material.uniforms && grid.material.uniforms.uColor) {
+        grid.material.uniforms.uColor.value.set(0x888888);
+    }
+    grid.material.opacity = 0.2;
+    grid.material.transparent = true;
+
+    // Add lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    world.scene.three.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(100, 200, 100);
+    world.scene.three.add(directionalLight);
 
     // 5. Set up FragmentsManager with local worker to avoid CORS issues
     const workerUrl = 'https://unpkg.com/@thatopen/fragments@3.2.13/dist/Worker/worker.mjs';
