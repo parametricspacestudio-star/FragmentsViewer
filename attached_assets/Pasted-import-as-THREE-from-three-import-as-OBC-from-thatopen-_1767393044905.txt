@@ -69,7 +69,7 @@ async function init() {
     grids.create(world);
 
     // 5. Set up FragmentsManager (Core Component)
-    const workerUrl = 'https://unpkg.com/@thatopen/fragments@3.2.13/dist/Worker/worker.mjs';
+    const workerUrl = 'https://thatopen.github.io/engine_fragment/resources/worker.mjs';
     const fragments = components.get(OBC.FragmentsManager);
     fragments.init(workerUrl);
 
