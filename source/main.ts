@@ -52,7 +52,7 @@ async function init() {
     const sceneComponent = new OBC.SimpleScene(components);
     sceneComponent.setup();
     world.scene = sceneComponent;
-    world.scene.three.background = new THREE.Color('#f0f2f5');
+    world.scene.three.background = null;
 
     const container = document.getElementById('container')!;
     const viewport = document.createElement('bim-viewport');
@@ -60,7 +60,6 @@ async function init() {
     
     const rendererComponent = new OBC.SimpleRenderer(components, viewport);
     world.renderer = rendererComponent;
-    rendererComponent.three.setClearColor('#f0f2f5');
 
     const cameraComponent = new OBC.OrthoPerspectiveCamera(components);
     world.camera = cameraComponent;
