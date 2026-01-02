@@ -322,7 +322,12 @@ async function Init ()
                                     },
                                 });
                                 console.log("IFC Conversion successful, fragment size:", fragmentBytes.buffer.byteLength);
-                                await LoadModelFromBuffer(fragmentBytes.buffer as ArrayBuffer, world, fragments);
+                                
+                                try {
+                                    await LoadModelFromBuffer(fragmentBytes.buffer as ArrayBuffer, world, fragments);
+                                } catch (loadError) {
+                                    console.error("Fragment load failed after conversion:", loadError);
+                                }
                             } catch (error: any) {
                                 console.error("Error converting IFC:", error);
                                 if (error.message) console.error("Error message:", error.message);
