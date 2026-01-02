@@ -183,16 +183,19 @@ async function Init ()
         const setupIfcImporter = () => {
             const anyImporter = ifcImporter as any;
             
-            // The error "Missing field: tolerancePlaneIntersection" suggests camelCase
-            // while web-ifc often uses UPPER_SNAKE_CASE for constants.
-            // We'll provide both to be safe, as different versions/wrappers might expect different casing.
+            // The error "Missing field: TOLERANCE_PLANE_INTERSECTION" is very specific.
+            // Some versions of web-ifc or the wrapper might be extremely sensitive to casing or missing fields.
+            // We'll provide all common fields in both UPPER_SNAKE_CASE and camelCase.
             anyImporter.settings = {
                 webIfc: {
                     COORDINATE_SYSTEM: 2,
+                    coordinateSystem: 2,
                     TOLERANCE_PLANE_INTERSECTION: 0.0001,
-                    tolerancePlaneIntersection: 0.0001, // Adding camelCase version
+                    tolerancePlaneIntersection: 0.0001,
                     COORDINATE_TO_ORIGIN: true,
-                    coordinateToOrigin: true // Adding camelCase version
+                    coordinateToOrigin: true,
+                    USE_FAST_BOOLS: true,
+                    useFastBools: true
                 },
                 autoCoordinate: true
             };
