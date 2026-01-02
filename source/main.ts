@@ -183,12 +183,15 @@ async function Init ()
         const setupIfcImporter = () => {
             const anyImporter = ifcImporter as any;
             
-            // Sync with package.json web-ifc version 0.0.70
+            // Explicitly sync with package.json web-ifc version 0.0.70
             ifcImporter.wasm = { 
                 absolute: true, 
                 path: "https://unpkg.com/web-ifc@0.0.70/" 
             };
             
+            // The error "Missing field: TOLERANCE_PLANE_INTERSECTION" is thrown by web-ifc's 
+            // Internal toWireType. We'll set these directly on the anyImporter.settings 
+            // as well as ensuring they're present in any direct IfcAPI calls if possible.
             anyImporter.settings = {
                 webIfc: {
                     COORDINATE_SYSTEM: 2,
@@ -198,7 +201,10 @@ async function Init ()
                     COORDINATE_TO_ORIGIN: true,
                     coordinateToOrigin: true,
                     USE_FAST_BOOLS: true,
-                    useFastBools: true
+                    useFastBools: true,
+                    // Additional safety fields
+                    DEFAULT_RENDER_COLOR: [1, 1, 1, 1],
+                    defaultRenderColor: [1, 1, 1, 1]
                 },
                 autoCoordinate: true
             };
