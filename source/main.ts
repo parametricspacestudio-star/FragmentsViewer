@@ -255,15 +255,33 @@ async function init() {
         `;
     });
 
-    const app = document.createElement('bim-grid') as BUI.Grid<['main']>;
-    app.layouts = {
-        main: {
-            template: `"panel viewport" / 28rem 1fr`,
-            elements: { panel, viewport },
-        },
-    };
-    app.layout = 'main';
-    document.body.append(app);
+    // 12. Create application layout
+    // We remove the bim-grid layout to allow the viewport to be full screen
+    // and overlay the panel on top of it.
+    document.body.append(viewport);
+    document.body.append(panel);
+
+    // Ensure viewport takes full screen
+    viewport.style.position = 'absolute';
+    viewport.style.top = '0';
+    viewport.style.left = '0';
+    viewport.style.width = '100%';
+    viewport.style.height = '100%';
+    viewport.style.zIndex = '0';
+
+    // Ensure panel is correctly positioned as an overlay
+    panel.classList.add('sidebar');
+    panel.style.position = 'fixed';
+    panel.style.top = '10px';
+    panel.style.right = '10px';
+    panel.style.zIndex = '10';
+    panel.style.maxHeight = 'calc(100vh - 20px)';
+    panel.style.width = '300px';
+
+    window.addEventListener('resize', () => {
+        rendererComponent.resize();
+        cameraComponent.updateAspect();
+    });
 
     window.addEventListener('dragover', (ev: DragEvent) => {
         ev.stopPropagation();
