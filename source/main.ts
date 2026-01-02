@@ -192,11 +192,19 @@ async function Init ()
                     TOLERANCE_PLANE_INTERSECTION: 0.0001,
                     tolerancePlaneIntersection: 0.0001, // Adding camelCase version
                     COORDINATE_TO_ORIGIN: true,
-                    coordinateToOrigin: true // Adding camelCase version
+                    coordinateToOrigin: true, // Adding camelCase version
+                    USE_FAST_BOOLS: true,
+                    useFastBools: true
                 },
                 autoCoordinate: true
             };
             
+            // If the error persists, it might be because the field is expected directly in the importer or in a different structure
+            // Let's also set it as a fallback directly on webIfc if available
+            if (anyImporter.webIfc) {
+                anyImporter.webIfc.tolerancePlaneIntersection = 0.0001;
+            }
+
             console.log("IFC Importer initialized with mandatory settings", anyImporter.settings);
         };
 
