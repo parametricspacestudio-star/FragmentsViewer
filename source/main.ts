@@ -183,44 +183,20 @@ async function Init ()
         const setupIfcImporter = () => {
             const anyImporter = ifcImporter as any;
             
-            // The "Missing field" error in web-ifc usually happens when the WebIFC instance
-            // itself doesn't have the expected defaults or when the settings passed to
-            // internal methods are incomplete.
-            
-            // 1. Set global settings on the importer
+            // The error "Missing field: tolerancePlaneIntersection" suggests camelCase
+            // while web-ifc often uses UPPER_SNAKE_CASE for constants.
+            // We'll provide both to be safe, as different versions/wrappers might expect different casing.
             anyImporter.settings = {
-                wasm: {
-                    path: wasmPath,
-                    absolute: false
-                },
                 webIfc: {
                     COORDINATE_SYSTEM: 2,
                     TOLERANCE_PLANE_INTERSECTION: 0.0001,
+                    tolerancePlaneIntersection: 0.0001, // Adding camelCase version
                     COORDINATE_TO_ORIGIN: true,
-                    USE_FAST_BOOLS: true
+                    coordinateToOrigin: true // Adding camelCase version
                 },
                 autoCoordinate: true
             };
             
-            // 2. Access the internal WebIFC instance and set defaults there if possible
-            // In some versions, this is called 'webIfc', in others it might be reachable via internal state.
-            if (anyImporter.webIfc) {
-                const webIfc = anyImporter.webIfc;
-                // Force properties onto the underlying WebIFC instance
-                Object.assign(webIfc, {
-                    TOLERANCE_PLANE_INTERSECTION: 0.0001,
-                    COORDINATE_TO_ORIGIN: true,
-                    USE_FAST_BOOLS: true
-                });
-                
-                // Also try camelCase just in case
-                Object.assign(webIfc, {
-                    tolerancePlaneIntersection: 0.0001,
-                    coordinateToOrigin: true,
-                    useFastBools: true
-                });
-            }
-
             console.log("IFC Importer initialized with mandatory settings", anyImporter.settings);
         };
 
@@ -322,12 +298,7 @@ async function Init ()
                                     },
                                 });
                                 console.log("IFC Conversion successful, fragment size:", fragmentBytes.buffer.byteLength);
-                                
-                                try {
-                                    await LoadModelFromBuffer(fragmentBytes.buffer as ArrayBuffer, world, fragments);
-                                } catch (loadError) {
-                                    console.error("Fragment load failed after conversion:", loadError);
-                                }
+                                await LoadModelFromBuffer(fragmentBytes.buffer as ArrayBuffer, world, fragments);
                             } catch (error: any) {
                                 console.error("Error converting IFC:", error);
                                 if (error.message) console.error("Error message:", error.message);

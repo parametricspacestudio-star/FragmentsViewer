@@ -38,8 +38,8 @@ if (isServeMode) {
         }
     }));
 
-    app.listen(process.env.PORT || 5000, '0.0.0.0', () => {
-        console.log(`Gateway serving on http://0.0.0.0:${process.env.PORT || 5000} -> esbuild on ${esPort}`);
+    app.listen(5000, '0.0.0.0', () => {
+        console.log(`Gateway serving on http://0.0.0.0:5000 -> esbuild on ${esPort}`);
     });
 } else {
     await esbuild.build(buildParams);
