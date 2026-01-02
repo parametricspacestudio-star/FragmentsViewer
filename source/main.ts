@@ -183,9 +183,12 @@ async function Init ()
         const setupIfcImporter = () => {
             const anyImporter = ifcImporter as any;
             
-            // The error "Missing field: TOLERANCE_PLANE_INTERSECTION" is very specific.
-            // Some versions of web-ifc or the wrapper might be extremely sensitive to casing or missing fields.
-            // We'll provide all common fields in both UPPER_SNAKE_CASE and camelCase.
+            // Sync with package.json web-ifc version 0.0.70
+            ifcImporter.wasm = { 
+                absolute: true, 
+                path: "https://unpkg.com/web-ifc@0.0.70/" 
+            };
+            
             anyImporter.settings = {
                 webIfc: {
                     COORDINATE_SYSTEM: 2,
