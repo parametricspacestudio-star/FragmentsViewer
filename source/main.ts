@@ -141,9 +141,7 @@ async function LoadModelFromUrl (url: string, world: OBC.World, fragments: FRAGS
 async function LoadModelFromUrlHash (hash: string, world: OBC.World, fragments: FRAGS.FragmentsModels)
 {
         if (hash.length === 0) {
-                for (const model of fragments.models.list.values()) {
-                    await fragments.disposeModel((model as any).uuid || (model as any).id || (model as any).modelId);
-                }
+                await fragments.disposeModel (ModelIdentifier);
                 fragments.update (true);
                 return;
         }
