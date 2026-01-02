@@ -184,9 +184,9 @@ async function Init ()
         fragments.settings.autoCoordinate = false;
         
         const ifcImporter = new FRAGS.IfcImporter();
-        // Use unpkg with version 0.0.70 - ensure it's a direct link to the WASM file or directory
-        const wasmPath = "https://unpkg.com/web-ifc@0.0.70/";
-        ifcImporter.wasm = { absolute: true, path: wasmPath };
+        // Use local WASM files instead of remote CDN to avoid cross-origin and "Missing field" errors
+        const wasmPath = "/wasm/";
+        ifcImporter.wasm = { absolute: false, path: wasmPath };
         
         const setupIfcImporter = () => {
             const anyImporter = ifcImporter as any;
