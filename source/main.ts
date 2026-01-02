@@ -183,26 +183,28 @@ async function Init ()
         const setupIfcImporter = () => {
             const anyImporter = ifcImporter as any;
             
-            // The error "Missing field: tolerancePlaneIntersection" suggests camelCase
-            // while web-ifc often uses UPPER_SNAKE_CASE for constants.
-            // We'll provide both to be safe, as different versions/wrappers might expect different casing.
+            // The error "Missing field: TOLERANCE_PLANE_INTERSECTION" is thrown by the emscripten/web-ifc layer
+            // when it expects these fields to be present in the settings object passed to OpenModel.
+            // We ensure they are present in the settings object.
             anyImporter.settings = {
+                wasm: {
+                    path: wasmPath,
+                    absolute: false
+                },
                 webIfc: {
                     COORDINATE_SYSTEM: 2,
                     TOLERANCE_PLANE_INTERSECTION: 0.0001,
-                    tolerancePlaneIntersection: 0.0001, // Adding camelCase version
                     COORDINATE_TO_ORIGIN: true,
-                    coordinateToOrigin: true, // Adding camelCase version
-                    USE_FAST_BOOLS: true,
-                    useFastBools: true
+                    USE_FAST_BOOLS: true
                 },
                 autoCoordinate: true
             };
             
-            // If the error persists, it might be because the field is expected directly in the importer or in a different structure
-            // Let's also set it as a fallback directly on webIfc if available
+            // Injecting directly into webIfc instance if it exists
             if (anyImporter.webIfc) {
-                anyImporter.webIfc.tolerancePlaneIntersection = 0.0001;
+                anyImporter.webIfc.TOLERANCE_PLANE_INTERSECTION = 0.0001;
+                anyImporter.webIfc.COORDINATE_TO_ORIGIN = true;
+                anyImporter.webIfc.USE_FAST_BOOLS = true;
             }
 
             console.log("IFC Importer initialized with mandatory settings", anyImporter.settings);
