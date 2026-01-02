@@ -1,3 +1,5 @@
+
+
 import * as THREE from 'three';
 import * as OBC from '@thatopen/components';
 import * as FRAGS from '@thatopen/fragments';
@@ -39,7 +41,7 @@ async function FitModelToWindow (world: OBC.World, fragments: FRAGS.FragmentsMod
                 boundingBox.union(box);
             }
         }
-        
+
         let boundingSphere = boundingBox.getBoundingSphere (new THREE.Sphere ());
 
         let perspectiveCamera = world.camera.three as THREE.PerspectiveCamera;
@@ -81,7 +83,7 @@ async function LoadModelInternal (buffer: ArrayBuffer, world: OBC.World, fragmen
         try {
                 // Generate a unique ID for each model to allow loading multiple without conflicts
                 const modelId = THREE.MathUtils.generateUUID();
-                
+
                 const isCompressed = IsCompressedBuffer(buffer);
                 console.log("Loading model, compressed:", isCompressed, "buffer size:", buffer.byteLength, "id:", modelId);
 
@@ -89,10 +91,10 @@ async function LoadModelInternal (buffer: ArrayBuffer, world: OBC.World, fragmen
                         modelId: modelId,
                         raw: !isCompressed
                 });
-                
+
                 // Ensure model is visible and added to scene
                 world.scene.three.add(model.object);
-                
+
                 model.object.traverse((child: any) => {
                     if (child instanceof THREE.Mesh) {
                         if (Array.isArray(child.material)) {
@@ -102,7 +104,7 @@ async function LoadModelInternal (buffer: ArrayBuffer, world: OBC.World, fragmen
                         }
                     }
                 });
-                
+
                 await FitModelToWindow (world, fragments);
                 fragments.update(true);
                 console.log("Model loaded successfully");
@@ -174,21 +176,21 @@ async function Init ()
 
         const fragments = new FRAGS.FragmentsModels (workerObjectUrl);
         fragments.settings.autoCoordinate = false;
-        
+
         const ifcImporter = new FRAGS.IfcImporter();
         // Use local WASM files instead of remote CDN to avoid cross-origin and "Missing field" errors
         const wasmPath = "/wasm/";
         ifcImporter.wasm = { absolute: false, path: wasmPath };
-        
+
         const setupIfcImporter = () => {
             const anyImporter = ifcImporter as any;
-            
+
             // Explicitly sync with package.json web-ifc version 0.0.70
             ifcImporter.wasm = { 
                 absolute: true, 
                 path: "https://unpkg.com/web-ifc@0.0.70/" 
             };
-            
+
             // The error "Missing field: TOLERANCE_PLANE_INTERSECTION" is thrown by web-ifc's 
             // Internal toWireType. We'll set these directly on the anyImporter.settings 
             // as well as ensuring they're present in any direct IfcAPI calls if possible.
@@ -208,7 +210,7 @@ async function Init ()
                 },
                 autoCoordinate: true
             };
-            
+
             console.log("IFC Importer initialized with mandatory settings", anyImporter.settings);
         };
 
@@ -224,7 +226,7 @@ async function Init ()
 
         const mouse = new THREE.Vector2 ();
         container.addEventListener ('click', async (event) => {
-                
+
         });
 
         window.addEventListener ('dragstart', (ev) => {
@@ -297,7 +299,7 @@ async function Init ()
                                 const buffer = await file.arrayBuffer();
                                 console.log("IFC Buffer size:", buffer.byteLength);
                                 const ifcBytes = new Uint8Array(buffer);
-                                
+
                                 if (!ifcImporter.wasm.path) {
                                     console.error("IFC Importer WASM path not set");
                                 }
@@ -340,9 +342,11 @@ async function Init ()
         });
 
         document.body.append (panel);
-        
+
         // Remove automatic example loading
         // await LoadModelFromUrlHash (window.location.hash, world, fragments);
 }
 
 Init ();
+
+
