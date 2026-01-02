@@ -25,12 +25,21 @@ class ProgressBar {
     }
 }
 
+// Helper to detect compressed fragment buffers
+function isCompressedBuffer(buffer: ArrayBuffer): boolean {
+    if (buffer.byteLength < 2) return false;
+    const intArray = new Uint8Array(buffer);
+    if (intArray[0] !== 0x78) return false;
+    if (intArray[1] !== 0x01 && intArray[1] !== 0x9C && intArray[1] !== 0xDA) return false;
+    return true;
+}
+
 // Main application initialization
 async function init() {
     // 1. Initialize the Components system
     const components = new OBC.Components();
     
-    // 2. Create the 3D world using the modern pattern from tutorials
+    // 2. Create the 3D world
     const worlds = components.get(OBC.Worlds);
     const world = worlds.create<
         OBC.SimpleScene,
@@ -68,12 +77,19 @@ async function init() {
     const grids = components.get(OBC.Grids);
     grids.create(world);
 
-    // 5. Set up FragmentsManager (Core Component)
+    // 5. Set up FragmentsManager with local worker to avoid CORS issues
     const workerUrl = 'https://unpkg.com/@thatopen/fragments@3.2.13/dist/Worker/worker.mjs';
-    const fragments = components.get(OBC.FragmentsManager);
-    fragments.init(workerUrl);
+    const fetchedWorker = await fetch(workerUrl);
+    const workerText = await fetchedWorker.text();
+    const workerFile = new File([new Blob([workerText])], 'worker.mjs', {
+        type: 'text/javascript',
+    });
+    const workerObjectUrl = URL.createObjectURL(workerFile);
 
-    // 6. Set up Highlighter (Frontend Component) for selection
+    const fragments = components.get(OBC.FragmentsManager);
+    fragments.init(workerObjectUrl);
+
+    // 6. Set up Highlighter for selection
     const highlighter = components.get(OBCF.Highlighter);
     highlighter.setup({ world });
     highlighter.zoomToSelection = true;
@@ -93,50 +109,51 @@ async function init() {
         fragments.core.update(true)
     );
 
-    // 9. Handle model loading - this is the official pattern
+    // 9. Handle model loading
     fragments.list.onItemSet.add(async ({ value: model }) => {
         model.useCamera(world.camera.three);
         world.scene.three.add(model.object);
+        
+        model.object.traverse((child: any) => {
+            if (child instanceof THREE.Mesh) {
+                if (Array.isArray(child.material)) {
+                    child.material.forEach(m => m.side = THREE.DoubleSide);
+                } else if (child.material) {
+                    child.material.side = THREE.DoubleSide;
+                }
+            }
+        });
+
         await fragments.core.update(true);
     });
 
-    // 10. Set up UI components using @thatopen/ui-obc
-
-    // Models List Component - shows loaded models with actions
+    // 10. UI components
     const [modelsList] = BUIC.tables.modelsList({
         components,
         metaDataTags: ['schema'],
         actions: { download: true },
     });
 
-    // Spatial Tree Component - shows model hierarchy
     const [spatialTree] = BUIC.tables.spatialTree({
         components,
         models: [],
     });
     spatialTree.preserveStructureOnFilter = true;
 
-    // Load Fragment Button
     const [loadFragBtn] = BUIC.buttons.loadFrag({ components });
 
-    // Search functionality for spatial tree
     const onTreeSearch = (e: Event) => {
         const input = e.target as BUI.TextInput;
         spatialTree.queryString = input.value;
     };
 
-    // Fit model to window function
     const fitModelToWindow = async () => {
-        if (fragments.list.size === 0 || world.camera.controls === undefined) {
-            return;
-        }
+        if (fragments.list.size === 0 || world.camera.controls === undefined) return;
 
         let boundingBox = new THREE.Box3();
         for (const model of fragments.core.models.list.values()) {
             const boxes = await model.getBoxes();
-            for (const box of boxes) {
-                boundingBox.union(box);
-            }
+            for (const box of boxes) boundingBox.union(box);
         }
         
         const boundingSphere = boundingBox.getBoundingSphere(new THREE.Sphere());
@@ -144,35 +161,31 @@ async function init() {
         const fieldOfView = perspectiveCamera.fov / 2.0;
         const center = boundingSphere.center;
         
+        const distance = boundingSphere.radius / Math.sin(THREE.MathUtils.degToRad(fieldOfView));
         const centerToEye = new THREE.Vector3()
             .subVectors(perspectiveCamera.position, center)
             .normalize();
-        
-        const distance = boundingSphere.radius / Math.sin(THREE.MathUtils.degToRad(fieldOfView));
-        const eye = new THREE.Vector3()
-            .addVectors(center, centerToEye.multiplyScalar(distance));
+        const eye = new THREE.Vector3().addVectors(center, centerToEye.multiplyScalar(distance));
 
         world.camera.controls.setLookAt(eye.x, eye.y, eye.z, center.x, center.y, center.z, true);
         fragments.core.update(true);
     };
 
-    // Clear highlights function
-    const clearHighlights = async () => {
-        await highlighter.clear();
-    };
+    const clearHighlights = async () => await highlighter.clear();
 
-    // Function to load a fragment file
     const loadFragmentFile = async (file: File) => {
         const progressBar = new ProgressBar();
         try {
             progressBar.setText('Loading fragment...');
             const buffer = await file.arrayBuffer();
+            const isCompressed = isCompressedBuffer(buffer);
             const modelId = THREE.MathUtils.generateUUID();
             
             await fragments.core.load(buffer, {
                 modelId: modelId,
-                raw: file.name.endsWith('.frag')
+                raw: !isCompressed
             });
+            await fitModelToWindow();
         } catch (error) {
             console.error('Error loading fragment:', error);
             alert('Failed to load fragment file');
@@ -181,7 +194,6 @@ async function init() {
         }
     };
 
-    // Function to load and convert IFC file
     const loadIfcFile = async (file: File) => {
         const progressBar = new ProgressBar();
         try {
@@ -190,6 +202,7 @@ async function init() {
             const typedArray = new Uint8Array(buffer);
             
             await ifcLoader.load(typedArray, true, file.name);
+            await fitModelToWindow();
         } catch (error) {
             console.error('Error converting IFC:', error);
             alert('Failed to convert IFC file');
@@ -198,15 +211,14 @@ async function init() {
         }
     };
 
-    // 11. Create the main UI panel
+    // 11. Main UI panel
     const panel = BUI.Component.create(() => {
         const onLoadFragment = () => {
             const fileInput = document.createElement('input');
             fileInput.type = 'file';
             fileInput.accept = '.frag';
             fileInput.onchange = async (event: Event) => {
-                const target = event.target as HTMLInputElement;
-                const file = target.files?.[0];
+                const file = (event.target as HTMLInputElement).files?.[0];
                 if (file) await loadFragmentFile(file);
             };
             fileInput.click();
@@ -217,8 +229,7 @@ async function init() {
             fileInput.type = 'file';
             fileInput.accept = '.ifc';
             fileInput.onchange = async (event: Event) => {
-                const target = event.target as HTMLInputElement;
-                const file = target.files?.[0];
+                const file = (event.target as HTMLInputElement).files?.[0];
                 if (file) await loadIfcFile(file);
             };
             fileInput.click();
@@ -226,107 +237,50 @@ async function init() {
 
         return BUI.html`
             <bim-panel active label="BIM Viewer Controls" class="sidebar">
-                <!-- File Operations Section -->
                 <bim-panel-section label="File Operations" icon="ph:folder-open">
-                    <bim-button 
-                        label="Load Fragment" 
-                        @click=${onLoadFragment}
-                        icon="ph:file-3d">
-                    </bim-button>
-                    <bim-button 
-                        label="Load IFC" 
-                        @click=${onLoadIFC}
-                        icon="ph:file-3d">
-                    </bim-button>
+                    <bim-button label="Load Fragment" @click=${onLoadFragment} icon="ph:file-3d"></bim-button>
+                    <bim-button label="Load IFC" @click=${onLoadIFC} icon="ph:file-3d"></bim-button>
                     ${loadFragBtn}
                 </bim-panel-section>
-
-                <!-- View Controls Section -->
                 <bim-panel-section label="View Controls" icon="ph:eye">
-                    <bim-button 
-                        label="Fit to Window" 
-                        @click=${fitModelToWindow}
-                        icon="ph:arrows-in">
-                    </bim-button>
-                    <bim-button 
-                        label="Clear Highlights" 
-                        @click=${clearHighlights}
-                        icon="ph:eraser">
-                    </bim-button>
+                    <bim-button label="Fit to Window" @click=${fitModelToWindow} icon="ph:arrows-in"></bim-button>
+                    <bim-button label="Clear Highlights" @click=${clearHighlights} icon="ph:eraser"></bim-button>
                 </bim-panel-section>
-
-                <!-- Loaded Models Section -->
-                <bim-panel-section label="Loaded Models" icon="mage:box-3d-fill">
-                    ${modelsList}
-                </bim-panel-section>
-
-                <!-- Spatial Tree Section -->
+                <bim-panel-section label="Loaded Models" icon="mage:box-3d-fill">${modelsList}</bim-panel-section>
                 <bim-panel-section label="Model Tree" icon="ph:tree-structure">
-                    <bim-text-input 
-                        @input=${onTreeSearch} 
-                        placeholder="Search elements..."
-                        debounce="200">
-                    </bim-text-input>
+                    <bim-text-input @input=${onTreeSearch} placeholder="Search elements..." debounce="200"></bim-text-input>
                     ${spatialTree}
-                </bim-panel-section>
-
-                <!-- How to Use Section -->
-                <bim-panel-section label="How to Use" icon="ph:question">
-                    <div style="padding: 0.5rem;">
-                        <p>1. Drag & drop .frag or .ifc files to load models</p>
-                        <p>2. Click elements in the 3D view to select them</p>
-                        <p>3. Use the tree to navigate model hierarchy</p>
-                        <p>4. Search for specific elements in the tree</p>
-                    </div>
                 </bim-panel-section>
             </bim-panel>
         `;
     });
 
-    // 12. Create the main application layout
     const app = document.createElement('bim-grid') as BUI.Grid<['main']>;
     app.layouts = {
         main: {
-            template: `
-                "panel viewport"
-                / 28rem 1fr
-            `,
+            template: `"panel viewport" / 28rem 1fr`,
             elements: { panel, viewport },
         },
     };
     app.layout = 'main';
     document.body.append(app);
 
-    // 13. Add drag and drop functionality
     window.addEventListener('dragover', (ev: DragEvent) => {
         ev.stopPropagation();
         ev.preventDefault();
-        if (ev.dataTransfer) {
-            ev.dataTransfer.dropEffect = 'copy';
-        }
+        if (ev.dataTransfer) ev.dataTransfer.dropEffect = 'copy';
     });
 
     window.addEventListener('drop', async (ev: DragEvent) => {
         ev.stopPropagation();
         ev.preventDefault();
-
-        if (!ev.dataTransfer || ev.dataTransfer.items.length !== 1) {
-            return;
-        }
-
-        const item = ev.dataTransfer.items[0];
-        const file = item.getAsFile();
+        const file = ev.dataTransfer?.files?.[0];
         if (!file) return;
-
-        if (file.name.endsWith('.frag')) {
-            await loadFragmentFile(file);
-        } else if (file.name.endsWith('.ifc')) {
-            await loadIfcFile(file);
-        }
+        if (file.name.endsWith('.frag')) await loadFragmentFile(file);
+        else if (file.name.endsWith('.ifc')) await loadIfcFile(file);
     });
 
     console.log('BIM Viewer initialized successfully!');
 }
 
-// Start the application
 init().catch(console.error);
