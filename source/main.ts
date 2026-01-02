@@ -28,18 +28,18 @@ class ProgressBar
 
 async function FitModelToWindow (world: OBC.World, fragments: FRAGS.FragmentsModels)
 {
-        let model = fragments.models.list.get (ModelIdentifier);
-        if (model === undefined || world.camera.controls === undefined) {
+        if (fragments.models.list.size === 0 || world.camera.controls === undefined) {
                 return;
         }
 
-        let boxes = await model.getBoxes ();
-        let boxMinMaxPoints = [];
-        for (let box of boxes) {
-                boxMinMaxPoints.push (box.min);
-                boxMinMaxPoints.push (box.max);
+        let boundingBox = new THREE.Box3();
+        for (const model of fragments.models.list.values()) {
+            const boxes = await model.getBoxes();
+            for (const box of boxes) {
+                boundingBox.union(box);
+            }
         }
-        let boundingBox = new THREE.Box3 ().setFromPoints (boxMinMaxPoints);
+        
         let boundingSphere = boundingBox.getBoundingSphere (new THREE.Sphere ());
 
         let perspectiveCamera = world.camera.three as THREE.PerspectiveCamera;
@@ -79,14 +79,14 @@ function IsCompressedBuffer (buffer: ArrayBuffer) : boolean
 async function LoadModelInternal (buffer: ArrayBuffer, world: OBC.World, fragments: FRAGS.FragmentsModels)
 {
         try {
-                // Clear existing models before loading new ones
-                await fragments.disposeModel(ModelIdentifier);
+                // Generate a unique ID for each model to allow loading multiple without conflicts
+                const modelId = THREE.MathUtils.generateUUID();
                 
                 const isCompressed = IsCompressedBuffer(buffer);
-                console.log("Loading model, compressed:", isCompressed, "buffer size:", buffer.byteLength);
+                console.log("Loading model, compressed:", isCompressed, "buffer size:", buffer.byteLength, "id:", modelId);
 
                 const model = await fragments.load (buffer, {
-                        modelId: ModelIdentifier,
+                        modelId: modelId,
                         raw: !isCompressed
                 });
                 
@@ -114,9 +114,6 @@ async function LoadModelInternal (buffer: ArrayBuffer, world: OBC.World, fragmen
 
 async function LoadModelFromBuffer (buffer: ArrayBuffer, world: OBC.World, fragments: FRAGS.FragmentsModels)
 {
-        await fragments.disposeModel (ModelIdentifier);
-        fragments.update (true);
-
         const progressBar = new ProgressBar ();
         progressBar.SetText ('Loading model...');
         await LoadModelInternal (buffer, world, fragments);
@@ -125,9 +122,6 @@ async function LoadModelFromBuffer (buffer: ArrayBuffer, world: OBC.World, fragm
 
 async function LoadModelFromUrl (url: string, world: OBC.World, fragments: FRAGS.FragmentsModels)
 {
-        await fragments.disposeModel (ModelIdentifier);
-        fragments.update (true);
-
         const progressBar = new ProgressBar ();
         try {
                 progressBar.SetText ('Downloading model..');
@@ -144,8 +138,6 @@ async function LoadModelFromUrl (url: string, world: OBC.World, fragments: FRAGS
 async function LoadModelFromUrlHash (hash: string, world: OBC.World, fragments: FRAGS.FragmentsModels)
 {
         if (hash.length === 0) {
-                await fragments.disposeModel (ModelIdentifier);
-                fragments.update (true);
                 return;
         }
         LoadModelFromUrl (hash.substring (1), world, fragments);
