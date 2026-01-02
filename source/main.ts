@@ -183,9 +183,11 @@ async function Init ()
         const setupIfcImporter = () => {
             const anyImporter = ifcImporter as any;
             
-            // The error "Missing field: TOLERANCE_PLANE_INTERSECTION" is thrown by the emscripten/web-ifc layer
-            // when it expects these fields to be present in the settings object passed to OpenModel.
-            // We ensure they are present in the settings object.
+            // The "Missing field" error in web-ifc usually happens when the WebIFC instance
+            // itself doesn't have the expected defaults or when the settings passed to
+            // internal methods are incomplete.
+            
+            // 1. Set global settings on the importer
             anyImporter.settings = {
                 wasm: {
                     path: wasmPath,
@@ -200,11 +202,23 @@ async function Init ()
                 autoCoordinate: true
             };
             
-            // Injecting directly into webIfc instance if it exists
+            // 2. Access the internal WebIFC instance and set defaults there if possible
+            // In some versions, this is called 'webIfc', in others it might be reachable via internal state.
             if (anyImporter.webIfc) {
-                anyImporter.webIfc.TOLERANCE_PLANE_INTERSECTION = 0.0001;
-                anyImporter.webIfc.COORDINATE_TO_ORIGIN = true;
-                anyImporter.webIfc.USE_FAST_BOOLS = true;
+                const webIfc = anyImporter.webIfc;
+                // Force properties onto the underlying WebIFC instance
+                Object.assign(webIfc, {
+                    TOLERANCE_PLANE_INTERSECTION: 0.0001,
+                    COORDINATE_TO_ORIGIN: true,
+                    USE_FAST_BOOLS: true
+                });
+                
+                // Also try camelCase just in case
+                Object.assign(webIfc, {
+                    tolerancePlaneIntersection: 0.0001,
+                    coordinateToOrigin: true,
+                    useFastBools: true
+                });
             }
 
             console.log("IFC Importer initialized with mandatory settings", anyImporter.settings);
