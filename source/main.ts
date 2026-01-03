@@ -215,72 +215,155 @@ async function init() {
         propertiesPanel.style.display = propertiesPanel.style.display === 'none' ? 'block' : 'none';
     };
 
+    const normalizeProp = (rawProp: any) => {
+        if (!rawProp || typeof rawProp !== 'object') {
+            return { rawValue: rawProp, displayValue: String(rawProp ?? ''), ifcType: null };
+        }
+        const val = rawProp.value !== undefined ? rawProp.value : '';
+        return {
+            rawValue: val,
+            displayValue: String(val),
+            ifcType: rawProp.type || null,
+        };
+    };
+
+    const labelMap: Record<string, string> = {
+        Name: "Name",
+        Tag: "Mark",
+        ObjectType: "Type",
+        _category: "IFC class",
+        _guid: "IFC GUID",
+        _localId: "Internal ID",
+    };
+
     const displayElementData = (data: any[]) => {
         if (propertiesPanel.style.display === 'none') return;
         
         propertiesPanel.innerHTML = '';
         
-        const header = document.createElement('h3');
-        header.style.cssText = 'margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; font-weight: bold; font-size: 1.2rem;';
-        header.textContent = 'Element Properties';
-        propertiesPanel.appendChild(header);
+        const mainHeader = document.createElement('h3');
+        mainHeader.style.cssText = 'margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; font-weight: bold; font-size: 1.2rem;';
+        mainHeader.textContent = 'Element Properties';
+        propertiesPanel.appendChild(mainHeader);
         
         if (data.length === 0) {
             const emptyMsg = document.createElement('p');
             emptyMsg.style.color = '#666';
             emptyMsg.textContent = 'No properties found for the selection.';
             propertiesPanel.appendChild(emptyMsg);
-        } else {
-            for (const item of data) {
-                const container = document.createElement('div');
-                container.style.cssText = 'margin-bottom: 20px; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #eee; box-shadow: 0 2px 4px rgba(0,0,0,0.05);';
-                
-                const title = document.createElement('div');
-                title.style.cssText = 'font-weight: bold; color: #1a73e8; margin-bottom: 12px; font-size: 1rem; border-bottom: 1px solid #f1f3f4; padding-bottom: 8px;';
-                title.textContent = item.Name || item.type || 'Selected Element';
-                container.appendChild(title);
+            return;
+        }
 
-                const grid = document.createElement('div');
-                grid.style.cssText = 'display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; align-items: baseline;';
-
-                const addProperty = (label: string, value: any) => {
-                    if (value === undefined || value === null || (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0)) return;
-
-                    const labelEl = document.createElement('div');
-                    labelEl.style.cssText = 'font-size: 0.85rem; color: #5f6368; font-weight: 500;';
-                    labelEl.textContent = label.charAt(0).toUpperCase() + label.slice(1);
-
-                    const valueEl = document.createElement('div');
-                    valueEl.style.cssText = 'font-size: 0.85rem; color: #202124; word-break: break-word;';
-                    
-                    if (typeof value === 'object') {
-                        valueEl.textContent = JSON.stringify(value);
-                    } else {
-                        valueEl.textContent = String(value);
-                    }
-
-                    grid.appendChild(labelEl);
-                    grid.appendChild(valueEl);
-                };
-
-                // Prioritize common useful fields
-                const keys = Object.keys(item);
-                const priorityKeys = ['Name', 'Description', 'GlobalId', 'Tag', 'PredefinedType'];
-                
-                priorityKeys.forEach(key => {
-                    if (item[key]) addProperty(key, item[key]);
-                });
-
-                // Add other properties that aren't too complex
-                keys.forEach(key => {
-                    if (!priorityKeys.includes(key) && typeof item[key] !== 'object') {
-                        addProperty(key, item[key]);
-                    }
-                });
-
-                container.appendChild(grid);
-                propertiesPanel.appendChild(container);
+        for (const item of data) {
+            const normalized: Record<string, any> = {};
+            for (const key of Object.keys(item)) {
+                normalized[key] = normalizeProp(item[key]);
             }
+
+            // Cleanup logic
+            const rawName = normalized.Name?.displayValue || "";
+            const rawType = normalized.ObjectType?.displayValue || "";
+            
+            const displayName = rawName.split(":")[0] || "Unknown Name";
+            const displayType = rawType.split(":")[1] || rawType || "Unknown Type";
+            const displayMark = normalized.Tag?.displayValue || "N/A";
+
+            const container = document.createElement('div');
+            container.style.cssText = 'margin-bottom: 25px; background: #fff; border-radius: 8px; border: 1px solid #eee; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05);';
+
+            // Tier 1: Summary
+            const summarySection = document.createElement('div');
+            summarySection.style.cssText = 'padding: 15px; background: #f8f9fa; border-bottom: 1px solid #eee;';
+            
+            const summaryTitle = document.createElement('div');
+            summaryTitle.style.cssText = 'font-size: 1.1rem; font-weight: bold; color: #1a73e8; margin-bottom: 10px;';
+            summaryTitle.textContent = displayType;
+            summarySection.appendChild(summaryTitle);
+
+            const summaryLine = document.createElement('div');
+            summaryLine.style.cssText = 'height: 1px; background: #dee2e6; margin-bottom: 10px;';
+            summarySection.appendChild(summaryLine);
+
+            const addSummaryField = (label: string, value: string) => {
+                const field = document.createElement('div');
+                field.style.cssText = 'font-size: 0.9rem; margin-bottom: 4px; display: flex;';
+                field.innerHTML = `<span style="font-weight: 500; color: #5f6368; width: 60px; flex-shrink: 0;">${label}:</span> <span style="color: #202124;">${value}</span>`;
+                summarySection.appendChild(field);
+            };
+
+            addSummaryField("Name", displayName);
+            addSummaryField("Type", displayType);
+            addSummaryField("Mark", displayMark);
+            
+            container.appendChild(summarySection);
+
+            // Tier 2: Details
+            const detailsSection = document.createElement('div');
+            detailsSection.style.cssText = 'padding: 15px;';
+
+            const detailsHeader = document.createElement('div');
+            detailsHeader.style.cssText = 'font-weight: bold; font-size: 0.9rem; color: #3c4043; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;';
+            detailsHeader.textContent = 'Details';
+            detailsSection.appendChild(detailsHeader);
+
+            const identityGroup = document.createElement('div');
+            identityGroup.style.cssText = 'margin-bottom: 15px;';
+            identityGroup.innerHTML = '<div style="font-style: italic; font-size: 0.85rem; color: #70757a; margin-bottom: 8px;">Identity</div>';
+            
+            const addDetailRow = (parent: HTMLElement, label: string, value: string) => {
+                const row = document.createElement('div');
+                row.style.cssText = 'display: flex; justify-content: space-between; font-size: 0.85rem; padding: 4px 0; border-bottom: 1px solid #f8f9fa;';
+                row.innerHTML = `<span style="color: #5f6368;">• ${label}</span> <span style="color: #202124; font-weight: 500; text-align: right; margin-left: 10px;">${value}</span>`;
+                parent.appendChild(row);
+            };
+
+            addDetailRow(identityGroup, "Name", displayName);
+            addDetailRow(identityGroup, "Type", displayType);
+            addDetailRow(identityGroup, "Mark", displayMark);
+            detailsSection.appendChild(identityGroup);
+
+            // Advanced Section Toggle
+            const advancedToggle = document.createElement('button');
+            advancedToggle.style.cssText = 'background: none; border: none; color: #1a73e8; font-size: 0.8rem; cursor: pointer; padding: 0; margin-top: 10px; font-weight: 500;';
+            advancedToggle.textContent = 'View Advanced / IFC Data ▼';
+            
+            const advancedContent = document.createElement('div');
+            advancedContent.style.cssText = 'display: none; margin-top: 10px; padding: 10px; background: #f1f3f4; border-radius: 4px;';
+            
+            advancedToggle.onclick = () => {
+                const isHidden = advancedContent.style.display === 'none';
+                advancedContent.style.display = isHidden ? 'block' : 'none';
+                advancedToggle.textContent = isHidden ? 'Hide Advanced / IFC Data ▲' : 'View Advanced / IFC Data ▼';
+            };
+
+            const addAdvancedRow = (label: string, value: string) => {
+                const row = document.createElement('div');
+                row.style.cssText = 'display: flex; justify-content: space-between; font-size: 0.75rem; padding: 2px 0; font-family: monospace;';
+                row.innerHTML = `<span style="color: #5f6368;">${label}:</span> <span style="color: #202124; margin-left: 10px;">${value}</span>`;
+                advancedContent.appendChild(row);
+            };
+
+            // Priority keys mapping
+            const advancedKeys = ['_category', '_guid', '_localId'];
+            advancedKeys.forEach(key => {
+                if (normalized[key]) {
+                    addAdvancedRow(labelMap[key] || key, normalized[key].displayValue);
+                }
+            });
+
+            // Add raw types for summary fields
+            const rawTypes = [];
+            if (normalized.Name?.ifcType) rawTypes.push(`Name → ${normalized.Name.ifcType}`);
+            if (normalized.Tag?.ifcType) rawTypes.push(`Tag → ${normalized.Tag.ifcType}`);
+            if (rawTypes.length > 0) {
+                addAdvancedRow("Raw value types", rawTypes.join('; '));
+            }
+
+            detailsSection.appendChild(advancedToggle);
+            detailsSection.appendChild(advancedContent);
+            
+            container.appendChild(detailsSection);
+            propertiesPanel.appendChild(container);
         }
     };
 
