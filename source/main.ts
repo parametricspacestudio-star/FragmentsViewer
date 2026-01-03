@@ -197,10 +197,10 @@ async function init() {
     propertiesPanel.id = 'properties-panel';
     propertiesPanel.style.display = 'none';
     propertiesPanel.style.position = 'fixed';
-    propertiesPanel.style.top = '60px'; // Adjusted from 10px to avoid overlap with top-left heading on mobile
+    propertiesPanel.style.top = '80px'; // Pushed further down from 60px to avoid overlap
     propertiesPanel.style.right = '20px'; // Default for desktop
     propertiesPanel.style.width = '350px';
-    propertiesPanel.style.maxHeight = 'calc(100vh - 80px)';
+    propertiesPanel.style.maxHeight = 'calc(100vh - 100px)';
     propertiesPanel.style.backgroundColor = 'white';
     propertiesPanel.style.padding = '15px';
     propertiesPanel.style.borderRadius = '8px';
@@ -279,10 +279,11 @@ async function init() {
                 font-weight: 600;
             }
             #properties-panel {
-                top: 60px !important; /* Move slightly down to avoid overlap */
+                top: 80px !important; /* Pushed further down to avoid overlap */
                 left: 10px !important;
                 right: 10px !important;
                 width: calc(100% - 20px) !important;
+                max-height: calc(100vh - 100px) !important;
             }
         }
     `;
