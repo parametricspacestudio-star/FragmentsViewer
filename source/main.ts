@@ -213,66 +213,88 @@ async function init() {
 
     // Main Logo/Heading
     const companyHeading = document.createElement('div');
-    companyHeading.style.cssText = `
-        position: fixed;
-        top: 30px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 2000;
-        pointer-events: none;
-        text-align: center;
-        width: 100%;
+    companyHeading.id = 'company-heading';
+    
+    const style = document.createElement('style');
+    style.textContent = `
+        #company-heading {
+            position: fixed;
+            z-index: 2000;
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #company-heading h1 {
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #000;
+            transition: all 0.4s ease;
+            white-space: nowrap;
+        }
+
+        /* Desktop & Tablet */
+        @media (min-width: 768px) {
+            #company-heading {
+                top: 40px;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 10px 30px;
+            }
+            #company-heading h1 {
+                font-size: 2.5rem;
+                letter-spacing: 0.4em;
+                color: #fff;
+                text-shadow: 
+                    0 0 10px rgba(0, 243, 255, 0.5),
+                    0 0 20px rgba(0, 243, 255, 0.2);
+            }
+        }
+
+        /* Phone */
+        @media (max-width: 767px) {
+            #company-heading {
+                top: 15px;
+                right: 15px;
+                left: auto;
+                transform: none;
+                background: rgba(255, 255, 255, 0.7);
+                padding: 8px 12px;
+                border-radius: 4px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                backdrop-filter: blur(5px);
+            }
+            #company-heading h1 {
+                font-size: 0.9rem;
+                letter-spacing: 0.1em;
+                color: #333;
+                font-weight: 600;
+            }
+        }
     `;
+    document.head.appendChild(style);
     
     const headingText = document.createElement('h1');
     headingText.textContent = 'PARAMETER SPACE';
-    headingText.style.cssText = `
-        margin: 0;
-        font-family: 'Inter', 'Playfair Display', serif;
-        font-weight: 300;
-        font-style: italic;
-        letter-spacing: 0.5em;
-        font-size: 2.5rem;
-        color: #fff;
-        text-transform: uppercase;
-        text-shadow: 
-            0 0 10px rgba(0, 243, 255, 0.5),
-            0 0 20px rgba(0, 243, 255, 0.2),
-            0 0 30px rgba(188, 0, 255, 0.3);
-        mix-blend-mode: overlay;
-        opacity: 0.9;
-        transition: all 0.5s ease;
-    `;
     
-    // Add a secondary glow for the "electric" feel
-    const glowContainer = document.createElement('div');
-    glowContainer.style.cssText = `
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 100%;
-        height: 100%;
-        background: radial-gradient(circle, rgba(0, 243, 255, 0.1) 0%, transparent 70%);
-        filter: blur(20px);
-        z-index: -1;
-    `;
-
-    companyHeading.appendChild(glowContainer);
     companyHeading.appendChild(headingText);
     document.body.appendChild(companyHeading);
 
-    // Subtle animation for the "electric" feel
+    // Subtle animation for the "electric" pulse (Desktop only)
     let frame = 0;
     const animateHeading = () => {
-        frame += 0.05;
-        const pulse = Math.sin(frame) * 0.1 + 0.9;
-        headingText.style.opacity = pulse.toString();
-        headingText.style.textShadow = `
-            0 0 ${10 * pulse}px rgba(0, 243, 255, 0.5),
-            0 0 ${20 * pulse}px rgba(0, 243, 255, 0.2),
-            0 0 ${30 * pulse}px rgba(188, 0, 255, 0.3)
-        `;
+        if (window.innerWidth >= 768) {
+            frame += 0.05;
+            const pulse = Math.sin(frame) * 0.1 + 0.9;
+            headingText.style.opacity = pulse.toString();
+        } else {
+            headingText.style.opacity = '1';
+        }
         requestAnimationFrame(animateHeading);
     };
     animateHeading();
