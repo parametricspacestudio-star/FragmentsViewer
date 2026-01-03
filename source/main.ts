@@ -547,7 +547,11 @@ async function init() {
 
     if (highlighterAny.events && highlighterAny.events.select && highlighterAny.events.select.onClear) {
         highlighterAny.events.select.onClear.add(() => {
-            propertiesPanel.innerHTML = '<h3 style="margin-bottom: 10px; border-bottom: 2px solid #eee; padding-bottom: 5px;">Properties</h3><p style="color: #666;">No element selected. Click an element in the 3D view first.</p>';
+            panelContent.innerHTML = '';
+            const emptyMsg = document.createElement('p');
+            emptyMsg.style.color = '#666';
+            emptyMsg.textContent = 'No element selected. Click an element in the 3D view first.';
+            panelContent.appendChild(emptyMsg);
         });
     }
 
