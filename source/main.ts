@@ -187,18 +187,34 @@ async function init() {
     });
     spatialTree.preserveStructureOnFilter = true;
 
-    const categoriesDropdownTemplate = () => {
+    const categoriesDropdownTemplate = (onUpdate: (dropdown: BUI.Dropdown) => void) => {
         const onCreated = async (e?: Element) => {
             if (!e) return;
             const dropdown = e as BUI.Dropdown;
-            const modelCategories = new Set<string>();
-            for (const [, model] of fragments.list) {
-                const categories = await model.getItemsWithGeometryCategories();
-                for (const category of categories) {
-                    if (!category) continue;
-                    modelCategories.add(category);
-                }
+            onUpdate(dropdown);
+        };
+        return BUI.html`<bim-dropdown multiple ${BUI.ref(onCreated)}></bim-dropdown>`;
+    };
+
+    let dropdownA: BUI.Dropdown | null = null;
+    let dropdownB: BUI.Dropdown | null = null;
+
+    const categoriesDropdownA = BUI.Component.create<BUI.Dropdown>(() => categoriesDropdownTemplate((d) => dropdownA = d));
+    const categoriesDropdownB = BUI.Component.create<BUI.Dropdown>(() => categoriesDropdownTemplate((d) => dropdownB = d));
+
+    const updateDropdowns = async () => {
+        const modelCategories = new Set<string>();
+        for (const [, model] of fragments.list) {
+            const categories = await model.getItemsWithGeometryCategories();
+            for (const category of categories) {
+                if (!category) continue;
+                modelCategories.add(category);
             }
+        }
+        
+        const populate = (dropdown: BUI.Dropdown | null) => {
+            if (!dropdown) return;
+            dropdown.innerHTML = '';
             for (const category of modelCategories) {
                 const option = BUI.Component.create(
                     () => BUI.html`<bim-option label=${category}></bim-option>`,
@@ -206,13 +222,28 @@ async function init() {
                 dropdown.append(option);
             }
         };
-        return BUI.html`<bim-dropdown multiple ${BUI.ref(onCreated)}></bim-dropdown>`;
+
+        populate(dropdownA);
+        populate(dropdownB);
     };
 
-    const categoriesDropdownA = BUI.Component.create<BUI.Dropdown>(categoriesDropdownTemplate);
-    const categoriesDropdownB = BUI.Component.create<BUI.Dropdown>(categoriesDropdownTemplate);
+    fragments.list.onItemSet.add(async ({ value: model }) => {
+        model.useCamera(world.camera.three);
+        world.scene.three.add(model.object);
+        
+        model.object.traverse((child: any) => {
+            if (child instanceof THREE.Mesh) {
+                if (Array.isArray(child.material)) {
+                    child.material.forEach(m => m.side = THREE.DoubleSide);
+                } else if (child.material) {
+                    child.material.side = THREE.DoubleSide;
+                }
+            }
+        });
 
-    const [loadFragBtn] = BUIC.buttons.loadFrag({ components });
+        await fragments.core.update(true);
+        await updateDropdowns();
+    });
 
     const onTreeSearch = (e: Event) => {
         const input = e.target as BUI.TextInput;
