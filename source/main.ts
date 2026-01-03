@@ -173,6 +173,66 @@ async function init() {
 
     const clearHighlights = async () => await highlighter.clear();
 
+    // Element Properties Component
+    const propertiesPanel = document.createElement('div');
+    propertiesPanel.id = 'properties-panel';
+    propertiesPanel.style.display = 'none';
+    propertiesPanel.style.position = 'fixed';
+    propertiesPanel.style.top = '10px';
+    propertiesPanel.style.right = '370px';
+    propertiesPanel.style.width = '300px';
+    propertiesPanel.style.maxHeight = 'calc(100vh - 20px)';
+    propertiesPanel.style.backgroundColor = 'white';
+    propertiesPanel.style.padding = '10px';
+    propertiesPanel.style.borderRadius = '5px';
+    propertiesPanel.style.boxShadow = '0 0 10px rgba(0,0,0,0.2)';
+    propertiesPanel.style.zIndex = '100';
+    propertiesPanel.style.overflowY = 'auto';
+    propertiesPanel.style.color = 'black';
+    document.body.append(propertiesPanel);
+
+    const toggleProperties = () => {
+        propertiesPanel.style.display = propertiesPanel.style.display === 'none' ? 'block' : 'none';
+        updatePropertiesDisplay();
+    };
+
+    const updatePropertiesDisplay = async () => {
+        if (propertiesPanel.style.display === 'none') return;
+        
+        const selection = highlighter.selection.main;
+        if (!selection || Object.keys(selection).length === 0) {
+            propertiesPanel.innerHTML = '<h3>Properties</h3><p>No element selected</p>';
+            return;
+        }
+
+        let content = '<h3>Properties</h3>';
+        
+        for (const fragmentId in selection) {
+            const expressIds = selection[fragmentId];
+            for (const id of expressIds) {
+                for (const model of fragments.list.values()) {
+                    // Using internal fragment map since FragmentsModel is not directly exported on OBC in this version
+                    const modelAny = model as any;
+                    if (modelAny.fragments && modelAny.fragments.has(fragmentId)) {
+                        const props = await modelAny.getProperties(id);
+                        if (props) {
+                            content += `<div style="margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
+                                <strong>ID: ${id}</strong><br/>
+                                <pre style="font-size: 10px; white-space: pre-wrap; margin: 5px 0;">${JSON.stringify(props, null, 2)}</pre>
+                            </div>`;
+                        }
+                    }
+                }
+            }
+        }
+        propertiesPanel.innerHTML = content;
+    };
+
+    // Update properties when selection changes
+    viewport.addEventListener('click', () => {
+        setTimeout(updatePropertiesDisplay, 200);
+    });
+
     // Graphic Display Control
     let isColorEnabled = true;
     const toggleColors = () => {
@@ -277,6 +337,7 @@ async function init() {
                 <bim-panel-section label="View Controls" icon="ph:eye">
                     <bim-button label="Fit to Window" @click=${fitModelToWindow} icon="ph:arrows-in"></bim-button>
                     <bim-button label="Clear Highlights" @click=${clearHighlights} icon="ph:eraser"></bim-button>
+                    <bim-button label="Properties" @click=${toggleProperties} icon="ph:info"></bim-button>
                     <bim-checkbox label="Enable Colors" checked @change=${toggleColors}></bim-checkbox>
                 </bim-panel-section>
                 <bim-panel-section label="Loaded Models" icon="mage:box-3d-fill">${modelsList}</bim-panel-section>
