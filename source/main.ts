@@ -173,6 +173,30 @@ async function init() {
 
     const clearHighlights = async () => await highlighter.clear();
 
+    // Graphic Display Control
+    let isColorEnabled = true;
+    const toggleColors = () => {
+        isColorEnabled = !isColorEnabled;
+        for (const model of fragments.list.values()) {
+            model.object.traverse((child: any) => {
+                if (child instanceof THREE.Mesh) {
+                    if (Array.isArray(child.material)) {
+                        child.material.forEach((m: any) => {
+                            if (m.color) m.color.set(isColorEnabled ? 0xffffff : 0xcccccc);
+                            m.vertexColors = isColorEnabled;
+                            m.needsUpdate = true;
+                        });
+                    } else if (child.material) {
+                        if (child.material.color) child.material.color.set(isColorEnabled ? 0xffffff : 0xcccccc);
+                        child.material.vertexColors = isColorEnabled;
+                        child.material.needsUpdate = true;
+                    }
+                }
+            });
+        }
+        fragments.core.update(true);
+    };
+
     const loadFragmentFile = async (file: File) => {
         const progressBar = new ProgressBar();
         try {
@@ -244,6 +268,7 @@ async function init() {
                 <bim-panel-section label="View Controls" icon="ph:eye">
                     <bim-button label="Fit to Window" @click=${fitModelToWindow} icon="ph:arrows-in"></bim-button>
                     <bim-button label="Clear Highlights" @click=${clearHighlights} icon="ph:eraser"></bim-button>
+                    <bim-checkbox label="Enable Colors" checked @change=${toggleColors}></bim-checkbox>
                 </bim-panel-section>
                 <bim-panel-section label="Loaded Models" icon="mage:box-3d-fill">${modelsList}</bim-panel-section>
                 <bim-panel-section label="Model Tree" icon="ph:tree-structure">
