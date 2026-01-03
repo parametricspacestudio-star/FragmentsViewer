@@ -197,10 +197,10 @@ async function init() {
     propertiesPanel.id = 'properties-panel';
     propertiesPanel.style.display = 'none';
     propertiesPanel.style.position = 'fixed';
-    propertiesPanel.style.top = '10px';
-    propertiesPanel.style.right = '370px';
+    propertiesPanel.style.top = '60px'; // Adjusted from 10px to avoid overlap with top-left heading on mobile
+    propertiesPanel.style.right = '20px'; // Default for desktop
     propertiesPanel.style.width = '350px';
-    propertiesPanel.style.maxHeight = 'calc(100vh - 20px)';
+    propertiesPanel.style.maxHeight = 'calc(100vh - 80px)';
     propertiesPanel.style.backgroundColor = 'white';
     propertiesPanel.style.padding = '15px';
     propertiesPanel.style.borderRadius = '8px';
@@ -231,7 +231,6 @@ async function init() {
         #company-heading h1 {
             margin: 0;
             font-weight: 700;
-            letter-spacing: 0.1em;
             text-transform: uppercase;
             color: #000;
             transition: all 0.4s ease;
@@ -247,12 +246,16 @@ async function init() {
                 padding: 10px 30px;
             }
             #company-heading h1 {
-                font-size: 2.5rem;
+                font-size: 2.8rem; /* Slightly bigger */
                 letter-spacing: 0.4em;
                 color: #fff;
                 text-shadow: 
                     0 0 10px rgba(0, 243, 255, 0.5),
                     0 0 20px rgba(0, 243, 255, 0.2);
+            }
+            #properties-panel {
+                top: 20px !important;
+                right: 20px !important;
             }
         }
 
@@ -260,20 +263,26 @@ async function init() {
         @media (max-width: 767px) {
             #company-heading {
                 top: 15px;
-                right: 15px;
-                left: auto;
+                left: 15px; /* Moved to left hand side corner */
+                right: auto;
                 transform: none;
                 background: rgba(255, 255, 255, 0.7);
-                padding: 8px 12px;
+                padding: 6px 10px; /* Slightly more compact */
                 border-radius: 4px;
                 box-shadow: 0 2px 10px rgba(0,0,0,0.1);
                 backdrop-filter: blur(5px);
             }
             #company-heading h1 {
-                font-size: 0.9rem;
+                font-size: 0.75rem; /* Text smaller */
                 letter-spacing: 0.1em;
                 color: #333;
                 font-weight: 600;
+            }
+            #properties-panel {
+                top: 60px !important; /* Move slightly down to avoid overlap */
+                left: 10px !important;
+                right: 10px !important;
+                width: calc(100% - 20px) !important;
             }
         }
     `;
