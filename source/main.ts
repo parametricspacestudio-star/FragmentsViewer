@@ -197,19 +197,89 @@ async function init() {
     propertiesPanel.id = 'properties-panel';
     propertiesPanel.style.display = 'none';
     propertiesPanel.style.position = 'fixed';
-    propertiesPanel.style.top = '100px'; // Pushed further down from 60px to avoid overlap
-    propertiesPanel.style.right = '20px'; // Default for desktop
+    propertiesPanel.style.top = '100px'; 
+    propertiesPanel.style.left = '20px'; // Initial position on the left
     propertiesPanel.style.width = '300px';
-    propertiesPanel.style.maxHeight = 'calc(100vh - 100px)';
+    propertiesPanel.style.maxHeight = 'calc(100vh - 120px)';
     propertiesPanel.style.backgroundColor = 'white';
-    propertiesPanel.style.padding = '15px';
+    propertiesPanel.style.padding = '0'; // Padding moved to content
     propertiesPanel.style.borderRadius = '8px';
     propertiesPanel.style.boxShadow = '0 4px 20px rgba(0,0,0,0.3)';
     propertiesPanel.style.zIndex = '1000';
-    propertiesPanel.style.overflowY = 'auto';
+    propertiesPanel.style.overflow = 'hidden';
     propertiesPanel.style.color = 'black';
     propertiesPanel.style.fontFamily = 'sans-serif';
     document.body.append(propertiesPanel);
+
+    // Draggable Header Handle
+    const dragHandle = document.createElement('div');
+    dragHandle.style.cssText = `
+        padding: 8px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #eee;
+        cursor: move;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        user-select: none;
+    `;
+    dragHandle.innerHTML = '<div style="width: 30px; height: 4px; background: #ccc; border-radius: 2px;"></div>';
+    propertiesPanel.appendChild(dragHandle);
+
+    const panelContent = document.createElement('div');
+    panelContent.id = 'properties-panel-content';
+    panelContent.style.cssText = `
+        padding: 15px;
+        overflow-y: auto;
+        max-height: calc(100vh - 140px);
+    `;
+    propertiesPanel.appendChild(panelContent);
+
+    // Drag and Drop Logic
+    let isDragging = false;
+    let offset = { x: 0, y: 0 };
+
+    dragHandle.onmousedown = (e) => {
+        isDragging = true;
+        offset.x = propertiesPanel.offsetLeft - e.clientX;
+        offset.y = propertiesPanel.offsetTop - e.clientY;
+        propertiesPanel.style.transition = 'none'; // Disable transition while dragging
+    };
+
+    document.onmousemove = (e) => {
+        if (!isDragging) return;
+        propertiesPanel.style.left = (e.clientX + offset.x) + 'px';
+        propertiesPanel.style.top = (e.clientY + offset.y) + 'px';
+        propertiesPanel.style.right = 'auto'; // Disable right-side constraint
+    };
+
+    document.onmouseup = () => {
+        if (!isDragging) return;
+        isDragging = false;
+        propertiesPanel.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+    };
+
+    // Mobile touch support
+    dragHandle.ontouchstart = (e) => {
+        isDragging = true;
+        const touch = e.touches[0];
+        offset.x = propertiesPanel.offsetLeft - touch.clientX;
+        offset.y = propertiesPanel.offsetTop - touch.clientY;
+        propertiesPanel.style.transition = 'none';
+    };
+
+    document.ontouchmove = (e) => {
+        if (!isDragging) return;
+        const touch = e.touches[0];
+        propertiesPanel.style.left = (touch.clientX + offset.x) + 'px';
+        propertiesPanel.style.top = (touch.clientY + offset.y) + 'px';
+        propertiesPanel.style.right = 'auto';
+    };
+
+    document.ontouchend = () => {
+        isDragging = false;
+        propertiesPanel.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+    };
 
     // Main Logo/Heading
     const companyHeading = document.createElement('div');
@@ -255,8 +325,9 @@ async function init() {
                 letter-spacing: 0.2em;
             }
             #properties-panel {
-                top: 80px !important;
-                right: 20px !important;
+                top: 100px !important;
+                left: 20px !important;
+                right: auto !important;
             }
         }
 
@@ -332,18 +403,13 @@ async function init() {
     const displayElementData = (data: any[]) => {
         if (propertiesPanel.style.display === 'none') return;
         
-        propertiesPanel.innerHTML = '';
-        
-        const mainHeader = document.createElement('h3');
-        mainHeader.style.cssText = 'margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; font-weight: bold; font-size: 1.2rem;';
-        mainHeader.textContent = 'Element Properties';
-        propertiesPanel.appendChild(mainHeader);
+        panelContent.innerHTML = '';
         
         if (data.length === 0) {
             const emptyMsg = document.createElement('p');
             emptyMsg.style.color = '#666';
             emptyMsg.textContent = 'No properties found for the selection.';
-            propertiesPanel.appendChild(emptyMsg);
+            panelContent.appendChild(emptyMsg);
             return;
         }
 
@@ -456,7 +522,7 @@ async function init() {
             detailsSection.appendChild(advancedContent);
             
             container.appendChild(detailsSection);
-            propertiesPanel.appendChild(container);
+            panelContent.appendChild(container);
         }
     };
 
