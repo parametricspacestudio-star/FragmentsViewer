@@ -197,9 +197,9 @@ async function init() {
     propertiesPanel.id = 'properties-panel';
     propertiesPanel.style.display = 'none';
     propertiesPanel.style.position = 'fixed';
-    propertiesPanel.style.top = '80px'; // Pushed further down from 60px to avoid overlap
+    propertiesPanel.style.top = '100px'; // Pushed further down from 60px to avoid overlap
     propertiesPanel.style.right = '20px'; // Default for desktop
-    propertiesPanel.style.width = '350px';
+    propertiesPanel.style.width = '300px';
     propertiesPanel.style.maxHeight = 'calc(100vh - 100px)';
     propertiesPanel.style.backgroundColor = 'white';
     propertiesPanel.style.padding = '15px';
@@ -575,8 +575,8 @@ async function init() {
 
         const label = BUI.html`
             <div class="branding-title">
-                <span class="branding-parameter">Parameter</span>
-                <span class="branding-space">Space</span>
+                <span class="branding-parameter">Toolbar</span>
+                <span class="branding-space"></span>
             </div>
         `;
 
