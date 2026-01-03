@@ -180,15 +180,16 @@ async function init() {
     propertiesPanel.style.position = 'fixed';
     propertiesPanel.style.top = '10px';
     propertiesPanel.style.right = '370px';
-    propertiesPanel.style.width = '300px';
+    propertiesPanel.style.width = '350px';
     propertiesPanel.style.maxHeight = 'calc(100vh - 20px)';
     propertiesPanel.style.backgroundColor = 'white';
-    propertiesPanel.style.padding = '10px';
-    propertiesPanel.style.borderRadius = '5px';
-    propertiesPanel.style.boxShadow = '0 0 10px rgba(0,0,0,0.2)';
-    propertiesPanel.style.zIndex = '100';
+    propertiesPanel.style.padding = '15px';
+    propertiesPanel.style.borderRadius = '8px';
+    propertiesPanel.style.boxShadow = '0 4px 20px rgba(0,0,0,0.3)';
+    propertiesPanel.style.zIndex = '1000';
     propertiesPanel.style.overflowY = 'auto';
     propertiesPanel.style.color = 'black';
+    propertiesPanel.style.fontFamily = 'sans-serif';
     document.body.append(propertiesPanel);
 
     const toggleProperties = () => {
@@ -199,27 +200,32 @@ async function init() {
     const updatePropertiesDisplay = async () => {
         if (propertiesPanel.style.display === 'none') return;
         
+        // Correct selection access for @thatopen/components-front Highlighter
         const selection = highlighter.selection.main;
         if (!selection || Object.keys(selection).length === 0) {
-            propertiesPanel.innerHTML = '<h3>Properties</h3><p>No element selected</p>';
+            propertiesPanel.innerHTML = '<h3 style="margin-bottom: 10px; border-bottom: 2px solid #eee; padding-bottom: 5px;">Properties</h3><p style="color: #666;">No element selected. Click an element in the 3D view first.</p>';
             return;
         }
 
-        let content = '<h3>Properties</h3>';
+        let content = '<h3 style="margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px;">Element Properties</h3>';
         
         for (const fragmentId in selection) {
             const expressIds = selection[fragmentId];
             for (const id of expressIds) {
                 for (const model of fragments.list.values()) {
-                    // Using internal fragment map since FragmentsModel is not directly exported on OBC in this version
                     const modelAny = model as any;
+                    // Check if the fragment belongs to this model
                     if (modelAny.fragments && modelAny.fragments.has(fragmentId)) {
-                        const props = await modelAny.getProperties(id);
-                        if (props) {
-                            content += `<div style="margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
-                                <strong>ID: ${id}</strong><br/>
-                                <pre style="font-size: 10px; white-space: pre-wrap; margin: 5px 0;">${JSON.stringify(props, null, 2)}</pre>
-                            </div>`;
+                        try {
+                            const props = await modelAny.getProperties(id);
+                            if (props) {
+                                content += `<div style="margin-bottom: 20px; background: #f9f9f9; padding: 10px; border-radius: 4px; border: 1px solid #ddd;">
+                                    <div style="font-weight: bold; color: #333; margin-bottom: 5px; font-size: 0.9rem;">ID: ${id}</div>
+                                    <pre style="font-size: 11px; white-space: pre-wrap; margin: 0; font-family: monospace; background: #eee; padding: 8px; border-radius: 3px;">${JSON.stringify(props, null, 2)}</pre>
+                                </div>`;
+                            }
+                        } catch (e) {
+                            console.error(`Error getting properties for ${id}:`, e);
                         }
                     }
                 }
@@ -228,9 +234,10 @@ async function init() {
         propertiesPanel.innerHTML = content;
     };
 
-    // Update properties when selection changes
-    viewport.addEventListener('click', () => {
-        setTimeout(updatePropertiesDisplay, 200);
+    // Use a more robust event listener for selection
+    window.addEventListener('click', () => {
+        // Delay slightly to allow highlighter to update its state
+        setTimeout(updatePropertiesDisplay, 150);
     });
 
     // Graphic Display Control
