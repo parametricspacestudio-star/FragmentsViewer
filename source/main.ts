@@ -182,13 +182,15 @@ async function init() {
                 if (child instanceof THREE.Mesh) {
                     if (Array.isArray(child.material)) {
                         child.material.forEach((m: any) => {
-                            if (m.color) m.color.set(isColorEnabled ? 0xffffff : 0xcccccc);
+                            // Ensure vertex colors are respected if they exist
                             m.vertexColors = isColorEnabled;
+                            // Set color to pure white when enabled so it doesn't tint the material/vertex colors
+                            if (m.color) m.color.set(isColorEnabled ? 0xffffff : 0xcccccc);
                             m.needsUpdate = true;
                         });
                     } else if (child.material) {
-                        if (child.material.color) child.material.color.set(isColorEnabled ? 0xffffff : 0xcccccc);
                         child.material.vertexColors = isColorEnabled;
+                        if (child.material.color) child.material.color.set(isColorEnabled ? 0xffffff : 0xcccccc);
                         child.material.needsUpdate = true;
                     }
                 }
