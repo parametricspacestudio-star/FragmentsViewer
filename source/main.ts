@@ -240,7 +240,6 @@ async function init() {
                 <bim-panel-section label="File Operations" icon="ph:folder-open">
                     <bim-button label="Load Fragment" @click=${onLoadFragment} icon="ph:file-3d"></bim-button>
                     <bim-button label="Load IFC" @click=${onLoadIFC} icon="ph:file-3d"></bim-button>
-                    ${loadFragBtn}
                 </bim-panel-section>
                 <bim-panel-section label="View Controls" icon="ph:eye">
                     <bim-button label="Fit to Window" @click=${fitModelToWindow} icon="ph:arrows-in"></bim-button>
