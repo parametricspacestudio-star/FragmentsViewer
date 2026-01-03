@@ -575,7 +575,7 @@ async function init() {
 
         const label = BUI.html`
             <div class="branding-title">
-                <span class="branding-parameter">Toolbar</span>
+                <span class="branding-parameter">.    Toolbar</span>
                 <span class="branding-space"></span>
             </div>
         `;
