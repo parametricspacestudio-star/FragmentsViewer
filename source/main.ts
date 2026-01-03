@@ -94,6 +94,25 @@ async function init() {
     highlighter.setup({ world });
     highlighter.zoomToSelection = true;
 
+    // Clipper setup
+    const casters = components.get(OBC.Raycasters);
+    casters.get(world);
+
+    const clipper = components.get(OBC.Clipper);
+    clipper.enabled = true;
+
+    viewport.ondblclick = () => {
+        if (clipper.enabled) {
+            clipper.create(world);
+        }
+    };
+
+    window.onkeydown = (event) => {
+        if (event.code === "Delete" || event.code === "Backspace") {
+            if (clipper.enabled) clipper.delete(world);
+        }
+    };
+
     // 7. Set up IfcLoader for IFC conversion
     const ifcLoader = components.get(OBC.IfcLoader);
     await ifcLoader.setup({
@@ -345,6 +364,19 @@ async function init() {
                     <bim-button label="Clear Highlights" @click=${clearHighlights} icon="ph:eraser"></bim-button>
                     <bim-button label="Properties" @click=${toggleProperties} icon="ph:info"></bim-button>
                     <bim-checkbox label="Enable Colors" checked @change=${toggleColors}></bim-checkbox>
+                </bim-panel-section>
+                <bim-panel-section label="Clipper" icon="ph:scissors">
+                    <bim-checkbox label="Clipper Enabled" checked 
+                        @change="${({ target }: { target: BUI.Checkbox }) => {
+                            clipper.config.enabled = target.value;
+                        }}">
+                    </bim-checkbox>
+                    <bim-checkbox label="Clipper Visible" checked 
+                        @change="${({ target }: { target: BUI.Checkbox }) => {
+                            clipper.config.visible = target.value;
+                        }}">
+                    </bim-checkbox>
+                    <bim-button label="Delete All Planes" @click=${() => clipper.deleteAll()} icon="ph:trash"></bim-button>
                 </bim-panel-section>
                 <bim-panel-section label="Loaded Models" icon="mage:box-3d-fill">${modelsList}</bim-panel-section>
                 <bim-panel-section label="Model Tree" icon="ph:tree-structure">
