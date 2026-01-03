@@ -671,7 +671,8 @@ async function init() {
             progressBar.setText('Loading fragment...');
             const buffer = await file.arrayBuffer();
             const isCompressed = isCompressedBuffer(buffer);
-            const modelId = THREE.MathUtils.generateUUID();
+            
+            const modelId = file.name.split('.').shift() || 'model';
             
             await fragments.core.load(buffer, {
                 modelId: modelId,
@@ -736,6 +737,11 @@ async function init() {
 
         return BUI.html`
             <bim-panel active .label=${label} class="sidebar">
+                <bim-panel-section label="File Operations" icon="ph:folder-open">
+                    <bim-button label="Load Fragment" @click=${onLoadFragment} icon="ph:file-3d"></bim-button>
+                    <bim-button label="Load IFC" @click=${onLoadIFC} icon="ph:file-3d"></bim-button>
+                </bim-panel-section>
+
                 <bim-panel-section label="Visibility Management" icon="ph:eye">
                     <bim-button label="Reset Visibility" @click=${async ({ target }: { target: BUI.Button }) => {
                         target.loading = true;
@@ -763,16 +769,17 @@ async function init() {
                         }}></bim-button>
                     </bim-panel-section>
                 </bim-panel-section>
-                <bim-panel-section label="File Operations" icon="ph:folder-open">
-                    <bim-button label="Load Fragment" @click=${onLoadFragment} icon="ph:file-3d"></bim-button>
-                    <bim-button label="Load IFC" @click=${onLoadIFC} icon="ph:file-3d"></bim-button>
-                </bim-panel-section>
-                <bim-panel-section label="View Controls" icon="ph:eye">
-                    <bim-button label="Fit to Window" @click=${fitModelToWindow} icon="ph:arrows-in"></bim-button>
-                    <bim-button label="Clear Highlights" @click=${clearHighlights} icon="ph:eraser"></bim-button>
+
+                <bim-panel-section label="Selection & Properties" icon="ph:cursor-click">
                     <bim-button label="Properties" @click=${toggleProperties} icon="ph:info"></bim-button>
+                    <bim-button label="Clear Highlights" @click=${clearHighlights} icon="ph:eraser"></bim-button>
+                </bim-panel-section>
+
+                <bim-panel-section label="View Controls" icon="ph:monitor">
+                    <bim-button label="Fit to Window" @click=${fitModelToWindow} icon="ph:arrows-out"></bim-button>
                     <bim-checkbox label="Enable Colors" checked @change=${toggleColors}></bim-checkbox>
                 </bim-panel-section>
+
                 <bim-panel-section label="Clipper" icon="ph:scissors">
                     <bim-checkbox label="Clipper Enabled" checked 
                         @change="${({ target }: { target: BUI.Checkbox }) => {
@@ -786,10 +793,13 @@ async function init() {
                     </bim-checkbox>
                     <bim-button label="Delete All Planes" @click=${() => clipper.deleteAll()} icon="ph:trash"></bim-button>
                 </bim-panel-section>
-                <bim-panel-section label="Loaded Models" icon="mage:box-3d-fill">${modelsList}</bim-panel-section>
-                <bim-panel-section label="Model Tree" icon="ph:tree-structure">
-                    <bim-text-input @input=${onTreeSearch} placeholder="Search elements..." debounce="200"></bim-text-input>
-                    ${spatialTree}
+
+                <bim-panel-section label="Model Tree & List" icon="ph:tree-structure">
+                    <bim-panel-section label="Loaded Models" icon="mage:box-3d-fill" collapsed>${modelsList}</bim-panel-section>
+                    <bim-panel-section label="Spatial Tree" icon="ph:tree-structure">
+                        <bim-text-input @input=${onTreeSearch} placeholder="Search elements..." debounce="200"></bim-text-input>
+                        ${spatialTree}
+                    </bim-panel-section>
                 </bim-panel-section>
             </bim-panel>
         `;
