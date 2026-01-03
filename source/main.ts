@@ -101,6 +101,34 @@ async function init() {
     const clipper = components.get(OBC.Clipper);
     clipper.enabled = true;
 
+    const hider = components.get(OBC.Hider);
+
+    const isolateByCategory = async (categories: string[]) => {
+        const modelIdMap: OBC.ModelIdMap = {};
+        const categoriesRegex = categories.map((cat) => new RegExp(`^${cat}$`));
+        for (const [, model] of fragments.list) {
+            const items = await model.getItemsOfCategories(categoriesRegex);
+            const localIds = Object.values(items).flat();
+            modelIdMap[model.modelId] = new Set(localIds);
+        }
+        await hider.isolate(modelIdMap);
+    };
+
+    const hideByCategory = async (categories: string[]) => {
+        const modelIdMap: OBC.ModelIdMap = {};
+        const categoriesRegex = categories.map((cat) => new RegExp(`^${cat}$`));
+        for (const [, model] of fragments.list) {
+            const items = await model.getItemsOfCategories(categoriesRegex);
+            const localIds = Object.values(items).flat();
+            modelIdMap[model.modelId] = new Set(localIds);
+        }
+        await hider.set(false, modelIdMap);
+    };
+
+    const resetVisibility = async () => {
+        await hider.set(true);
+    };
+
     viewport.ondblclick = () => {
         if (clipper.enabled) {
             clipper.create(world);
@@ -158,6 +186,31 @@ async function init() {
         models: [],
     });
     spatialTree.preserveStructureOnFilter = true;
+
+    const categoriesDropdownTemplate = () => {
+        const onCreated = async (e?: Element) => {
+            if (!e) return;
+            const dropdown = e as BUI.Dropdown;
+            const modelCategories = new Set<string>();
+            for (const [, model] of fragments.list) {
+                const categories = await model.getItemsWithGeometryCategories();
+                for (const category of categories) {
+                    if (!category) continue;
+                    modelCategories.add(category);
+                }
+            }
+            for (const category of modelCategories) {
+                const option = BUI.Component.create(
+                    () => BUI.html`<bim-option label=${category}></bim-option>`,
+                );
+                dropdown.append(option);
+            }
+        };
+        return BUI.html`<bim-dropdown multiple ${BUI.ref(onCreated)}></bim-dropdown>`;
+    };
+
+    const categoriesDropdownA = BUI.Component.create<BUI.Dropdown>(categoriesDropdownTemplate);
+    const categoriesDropdownB = BUI.Component.create<BUI.Dropdown>(categoriesDropdownTemplate);
 
     const [loadFragBtn] = BUIC.buttons.loadFrag({ components });
 
@@ -652,6 +705,33 @@ async function init() {
 
         return BUI.html`
             <bim-panel active .label=${label} class="sidebar">
+                <bim-panel-section label="Visibility Management" icon="ph:eye">
+                    <bim-button label="Reset Visibility" @click=${async ({ target }: { target: BUI.Button }) => {
+                        target.loading = true;
+                        await resetVisibility();
+                        target.loading = false;
+                    }}></bim-button>
+                    <bim-panel-section label="Isolation">
+                        ${categoriesDropdownA}
+                        <bim-button label="Isolate Category" @click=${async ({ target }: { target: BUI.Button }) => {
+                            const categories = categoriesDropdownA.value;
+                            if (categories.length === 0) return;
+                            target.loading = true;
+                            await isolateByCategory(categories);
+                            target.loading = false;
+                        }}></bim-button>
+                    </bim-panel-section>
+                    <bim-panel-section label="Hiding">
+                        ${categoriesDropdownB}
+                        <bim-button label="Hide Category" @click=${async ({ target }: { target: BUI.Button }) => {
+                            const categories = categoriesDropdownB.value;
+                            if (categories.length === 0) return;
+                            target.loading = true;
+                            await hideByCategory(categories);
+                            target.loading = false;
+                        }}></bim-button>
+                    </bim-panel-section>
+                </bim-panel-section>
                 <bim-panel-section label="File Operations" icon="ph:folder-open">
                     <bim-button label="Load Fragment" @click=${onLoadFragment} icon="ph:file-3d"></bim-button>
                     <bim-button label="Load IFC" @click=${onLoadIFC} icon="ph:file-3d"></bim-button>
