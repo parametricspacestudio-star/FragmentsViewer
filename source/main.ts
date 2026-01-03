@@ -211,6 +211,72 @@ async function init() {
     propertiesPanel.style.fontFamily = 'sans-serif';
     document.body.append(propertiesPanel);
 
+    // Main Logo/Heading
+    const companyHeading = document.createElement('div');
+    companyHeading.style.cssText = `
+        position: fixed;
+        top: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 2000;
+        pointer-events: none;
+        text-align: center;
+        width: 100%;
+    `;
+    
+    const headingText = document.createElement('h1');
+    headingText.textContent = 'PARAMETER SPACE';
+    headingText.style.cssText = `
+        margin: 0;
+        font-family: 'Inter', 'Playfair Display', serif;
+        font-weight: 300;
+        font-style: italic;
+        letter-spacing: 0.5em;
+        font-size: 2.5rem;
+        color: #fff;
+        text-transform: uppercase;
+        text-shadow: 
+            0 0 10px rgba(0, 243, 255, 0.5),
+            0 0 20px rgba(0, 243, 255, 0.2),
+            0 0 30px rgba(188, 0, 255, 0.3);
+        mix-blend-mode: overlay;
+        opacity: 0.9;
+        transition: all 0.5s ease;
+    `;
+    
+    // Add a secondary glow for the "electric" feel
+    const glowContainer = document.createElement('div');
+    glowContainer.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, rgba(0, 243, 255, 0.1) 0%, transparent 70%);
+        filter: blur(20px);
+        z-index: -1;
+    `;
+
+    companyHeading.appendChild(glowContainer);
+    companyHeading.appendChild(headingText);
+    document.body.appendChild(companyHeading);
+
+    // Subtle animation for the "electric" feel
+    let frame = 0;
+    const animateHeading = () => {
+        frame += 0.05;
+        const pulse = Math.sin(frame) * 0.1 + 0.9;
+        headingText.style.opacity = pulse.toString();
+        headingText.style.textShadow = `
+            0 0 ${10 * pulse}px rgba(0, 243, 255, 0.5),
+            0 0 ${20 * pulse}px rgba(0, 243, 255, 0.2),
+            0 0 ${30 * pulse}px rgba(188, 0, 255, 0.3)
+        `;
+        requestAnimationFrame(animateHeading);
+    };
+    animateHeading();
+
     const toggleProperties = () => {
         propertiesPanel.style.display = propertiesPanel.style.display === 'none' ? 'block' : 'none';
     };
