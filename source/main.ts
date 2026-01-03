@@ -227,7 +227,7 @@ async function init() {
             align-items: center;
             justify-content: center;
             background: rgba(255, 255, 255, 0.7);
-            padding: 8px 15px;
+            padding: 4px 10px; /* Reduced margin/padding */
             border-radius: 4px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             backdrop-filter: blur(5px);
@@ -248,10 +248,10 @@ async function init() {
                 top: 20px;
                 left: 50%;
                 transform: translateX(-50%);
-                padding: 12px 40px;
+                padding: 6px 20px; /* Reduced padding for smaller background */
             }
             #company-heading h1 {
-                font-size: 1.5rem; /* Standardized size */
+                font-size: 1.2rem; /* Slightly smaller than 1.5rem */
                 letter-spacing: 0.2em;
             }
             #properties-panel {
@@ -267,10 +267,10 @@ async function init() {
                 left: 15px;
                 right: auto;
                 transform: none;
-                padding: 4px 8px;
+                padding: 3px 6px; /* Even smaller padding */
             }
             #company-heading h1 {
-                font-size: 0.5rem; /* Even smaller for mobile */
+                font-size: 0.45rem; /* Slightly smaller than 0.5rem */
                 letter-spacing: 0.1em;
             }
             #properties-panel {
