@@ -194,51 +194,50 @@ async function init() {
 
     const toggleProperties = () => {
         propertiesPanel.style.display = propertiesPanel.style.display === 'none' ? 'block' : 'none';
-        updatePropertiesDisplay();
     };
 
-    const updatePropertiesDisplay = async () => {
+    const displayElementData = (data: any[]) => {
         if (propertiesPanel.style.display === 'none') return;
         
-        // Correct selection access for @thatopen/components-front Highlighter
-        const selection = highlighter.selection.main;
-        if (!selection || Object.keys(selection).length === 0) {
-            propertiesPanel.innerHTML = '<h3 style="margin-bottom: 10px; border-bottom: 2px solid #eee; padding-bottom: 5px;">Properties</h3><p style="color: #666;">No element selected. Click an element in the 3D view first.</p>';
-            return;
-        }
-
         let content = '<h3 style="margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px;">Element Properties</h3>';
         
-        for (const fragmentId in selection) {
-            const expressIds = selection[fragmentId];
-            for (const id of expressIds) {
-                for (const model of fragments.list.values()) {
-                    const modelAny = model as any;
-                    // Check if the fragment belongs to this model
-                    if (modelAny.fragments && modelAny.fragments.has(fragmentId)) {
-                        try {
-                            const props = await modelAny.getProperties(id);
-                            if (props) {
-                                content += `<div style="margin-bottom: 20px; background: #f9f9f9; padding: 10px; border-radius: 4px; border: 1px solid #ddd;">
-                                    <div style="font-weight: bold; color: #333; margin-bottom: 5px; font-size: 0.9rem;">ID: ${id}</div>
-                                    <pre style="font-size: 11px; white-space: pre-wrap; margin: 0; font-family: monospace; background: #eee; padding: 8px; border-radius: 3px;">${JSON.stringify(props, null, 2)}</pre>
-                                </div>`;
-                            }
-                        } catch (e) {
-                            console.error(`Error getting properties for ${id}:`, e);
-                        }
-                    }
-                }
+        if (data.length === 0) {
+            content += '<p style="color: #666;">No properties found for the selection.</p>';
+        } else {
+            for (const item of data) {
+                content += `<div style="margin-bottom: 20px; background: #f9f9f9; padding: 10px; border-radius: 4px; border: 1px solid #ddd;">
+                    <div style="font-weight: bold; color: #333; margin-bottom: 5px; font-size: 0.9rem;">Element Data</div>
+                    <pre style="font-size: 11px; white-space: pre-wrap; margin: 0; font-family: monospace; background: #eee; padding: 8px; border-radius: 3px;">${JSON.stringify(item, null, 2)}</pre>
+                </div>`;
             }
         }
         propertiesPanel.innerHTML = content;
     };
 
-    // Use a more robust event listener for selection
-    window.addEventListener('click', () => {
-        // Delay slightly to allow highlighter to update its state
-        setTimeout(updatePropertiesDisplay, 150);
-    });
+    // Correct event listener using highlighter.events.select.onHighlight
+    const highlighterAny = highlighter as any;
+    if (highlighterAny.events && highlighterAny.events.select && highlighterAny.events.select.onHighlight) {
+        highlighterAny.events.select.onHighlight.add(async (modelIdMap: any) => {
+            const allElementData = [];
+            for (const [modelId, localIds] of Object.entries(modelIdMap)) {
+                const model = fragments.list.get(modelId) as any;
+                if (!model) continue;
+
+                // Use getItemsData as suggested in the documentation
+                if (model.getItemsData) {
+                    const elementData = await model.getItemsData([...(localIds as Set<number>)]);
+                    allElementData.push(...elementData);
+                }
+            }
+            displayElementData(allElementData);
+        });
+    }
+
+    if (highlighterAny.events && highlighterAny.events.select && highlighterAny.events.select.onClear) {
+        highlighterAny.events.select.onClear.add(() => {
+            propertiesPanel.innerHTML = '<h3 style="margin-bottom: 10px; border-bottom: 2px solid #eee; padding-bottom: 5px;">Properties</h3><p style="color: #666;">No element selected. Click an element in the 3D view first.</p>';
+        });
+    }
 
     // Graphic Display Control
     let isColorEnabled = true;
