@@ -221,7 +221,7 @@ async function init() {
         propertiesPanel.innerHTML = '';
         
         const header = document.createElement('h3');
-        header.style.cssText = 'margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px;';
+        header.style.cssText = 'margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; font-weight: bold; font-size: 1.2rem;';
         header.textContent = 'Element Properties';
         propertiesPanel.appendChild(header);
         
@@ -233,18 +233,52 @@ async function init() {
         } else {
             for (const item of data) {
                 const container = document.createElement('div');
-                container.style.cssText = 'margin-bottom: 20px; background: #f9f9f9; padding: 10px; border-radius: 4px; border: 1px solid #ddd;';
+                container.style.cssText = 'margin-bottom: 20px; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #eee; box-shadow: 0 2px 4px rgba(0,0,0,0.05);';
                 
-                const label = document.createElement('div');
-                label.style.cssText = 'font-weight: bold; color: #333; margin-bottom: 5px; font-size: 0.9rem;';
-                label.textContent = 'Element Data';
-                container.appendChild(label);
+                const title = document.createElement('div');
+                title.style.cssText = 'font-weight: bold; color: #1a73e8; margin-bottom: 12px; font-size: 1rem; border-bottom: 1px solid #f1f3f4; padding-bottom: 8px;';
+                title.textContent = item.Name || item.type || 'Selected Element';
+                container.appendChild(title);
+
+                const grid = document.createElement('div');
+                grid.style.cssText = 'display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; align-items: baseline;';
+
+                const addProperty = (label: string, value: any) => {
+                    if (value === undefined || value === null || (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0)) return;
+
+                    const labelEl = document.createElement('div');
+                    labelEl.style.cssText = 'font-size: 0.85rem; color: #5f6368; font-weight: 500;';
+                    labelEl.textContent = label.charAt(0).toUpperCase() + label.slice(1);
+
+                    const valueEl = document.createElement('div');
+                    valueEl.style.cssText = 'font-size: 0.85rem; color: #202124; word-break: break-word;';
+                    
+                    if (typeof value === 'object') {
+                        valueEl.textContent = JSON.stringify(value);
+                    } else {
+                        valueEl.textContent = String(value);
+                    }
+
+                    grid.appendChild(labelEl);
+                    grid.appendChild(valueEl);
+                };
+
+                // Prioritize common useful fields
+                const keys = Object.keys(item);
+                const priorityKeys = ['Name', 'Description', 'GlobalId', 'Tag', 'PredefinedType'];
                 
-                const pre = document.createElement('pre');
-                pre.style.cssText = 'font-size: 11px; white-space: pre-wrap; margin: 0; font-family: monospace; background: #eee; padding: 8px; border-radius: 3px;';
-                pre.textContent = JSON.stringify(item, null, 2);
-                container.appendChild(pre);
-                
+                priorityKeys.forEach(key => {
+                    if (item[key]) addProperty(key, item[key]);
+                });
+
+                // Add other properties that aren't too complex
+                keys.forEach(key => {
+                    if (!priorityKeys.includes(key) && typeof item[key] !== 'object') {
+                        addProperty(key, item[key]);
+                    }
+                });
+
+                container.appendChild(grid);
                 propertiesPanel.appendChild(container);
             }
         }
