@@ -74,25 +74,32 @@
 
         .branding-title {
             font-family: 'Orbitron', sans-serif !important;
-            font-weight: normal;
+            font-weight: bold !important;
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 1.1rem;
-            letter-spacing: 1px;
+            gap: 12px;
+            font-size: 1.5rem !important; /* Increased size */
+            letter-spacing: 2px;
+            color: #00e5ff !important; /* Electric Blue */
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
         }
 
         .branding-parameter {
             color: #000000 !important;
-            font-weight: normal !important;
-            font-family: 'Orbitron', sans-serif !important;
+            font-weight: 500 !important;
         }
 
         .branding-space {
-            color: #007bff !important; /* Electric Blue */
-            font-weight: bold !important;
+            color: #00e5ff !important; /* Brighter Electric Blue */
+            font-weight: 900 !important;
             text-transform: uppercase !important;
+        }
+
+        /* Override potential shadow DOM styles if needed */
+        bim-panel::part(label) {
             font-family: 'Orbitron', sans-serif !important;
+            font-size: 1.5rem !important;
+            color: #00e5ff !important;
         }
     </style>
 </head>
