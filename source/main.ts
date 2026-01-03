@@ -261,8 +261,15 @@ async function init() {
             fileInput.click();
         };
 
+        const label = BUI.html`
+            <div class="branding-title">
+                <span class="branding-parameter">Parameter</span>
+                <span class="branding-space">Space</span>
+            </div>
+        `;
+
         return BUI.html`
-            <bim-panel active label="BIM Viewer Controls" class="sidebar">
+            <bim-panel active .label=${label} class="sidebar">
                 <bim-panel-section label="File Operations" icon="ph:folder-open">
                     <bim-button label="Load Fragment" @click=${onLoadFragment} icon="ph:file-3d"></bim-button>
                     <bim-button label="Load IFC" @click=${onLoadIFC} icon="ph:file-3d"></bim-button>
