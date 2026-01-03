@@ -226,13 +226,18 @@ async function init() {
             display: flex;
             align-items: center;
             justify-content: center;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 8px 15px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            backdrop-filter: blur(5px);
         }
 
         #company-heading h1 {
             margin: 0;
             font-weight: 700;
             text-transform: uppercase;
-            color: #000;
+            color: #333;
             transition: all 0.4s ease;
             white-space: nowrap;
         }
@@ -240,21 +245,17 @@ async function init() {
         /* Desktop & Tablet */
         @media (min-width: 768px) {
             #company-heading {
-                top: 40px;
+                top: 20px;
                 left: 50%;
                 transform: translateX(-50%);
-                padding: 10px 30px;
+                padding: 12px 40px;
             }
             #company-heading h1 {
-                font-size: 2.8rem; /* Slightly bigger */
-                letter-spacing: 0.4em;
-                color: #fff;
-                text-shadow: 
-                    0 0 10px rgba(0, 243, 255, 0.5),
-                    0 0 20px rgba(0, 243, 255, 0.2);
+                font-size: 1.5rem; /* Standardized size */
+                letter-spacing: 0.2em;
             }
             #properties-panel {
-                top: 20px !important;
+                top: 80px !important;
                 right: 20px !important;
             }
         }
@@ -263,23 +264,17 @@ async function init() {
         @media (max-width: 767px) {
             #company-heading {
                 top: 15px;
-                left: 15px; /* Moved to left hand side corner */
+                left: 15px;
                 right: auto;
                 transform: none;
-                background: rgba(255, 255, 255, 0.7);
-                padding: 6px 10px; /* Slightly more compact */
-                border-radius: 4px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                backdrop-filter: blur(5px);
+                padding: 4px 8px;
             }
             #company-heading h1 {
-                font-size: 0.75rem; /* Text smaller */
+                font-size: 0.5rem; /* Even smaller for mobile */
                 letter-spacing: 0.1em;
-                color: #333;
-                font-weight: 600;
             }
             #properties-panel {
-                top: 80px !important; /* Pushed further down to avoid overlap */
+                top: 80px !important;
                 left: 10px !important;
                 right: 10px !important;
                 width: calc(100% - 20px) !important;
