@@ -218,19 +218,36 @@ async function init() {
     const displayElementData = (data: any[]) => {
         if (propertiesPanel.style.display === 'none') return;
         
-        let content = '<h3 style="margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px;">Element Properties</h3>';
+        propertiesPanel.innerHTML = '';
+        
+        const header = document.createElement('h3');
+        header.style.cssText = 'margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px;';
+        header.textContent = 'Element Properties';
+        propertiesPanel.appendChild(header);
         
         if (data.length === 0) {
-            content += '<p style="color: #666;">No properties found for the selection.</p>';
+            const emptyMsg = document.createElement('p');
+            emptyMsg.style.color = '#666';
+            emptyMsg.textContent = 'No properties found for the selection.';
+            propertiesPanel.appendChild(emptyMsg);
         } else {
             for (const item of data) {
-                content += `<div style="margin-bottom: 20px; background: #f9f9f9; padding: 10px; border-radius: 4px; border: 1px solid #ddd;">
-                    <div style="font-weight: bold; color: #333; margin-bottom: 5px; font-size: 0.9rem;">Element Data</div>
-                    <pre style="font-size: 11px; white-space: pre-wrap; margin: 0; font-family: monospace; background: #eee; padding: 8px; border-radius: 3px;">${JSON.stringify(item, null, 2)}</pre>
-                </div>`;
+                const container = document.createElement('div');
+                container.style.cssText = 'margin-bottom: 20px; background: #f9f9f9; padding: 10px; border-radius: 4px; border: 1px solid #ddd;';
+                
+                const label = document.createElement('div');
+                label.style.cssText = 'font-weight: bold; color: #333; margin-bottom: 5px; font-size: 0.9rem;';
+                label.textContent = 'Element Data';
+                container.appendChild(label);
+                
+                const pre = document.createElement('pre');
+                pre.style.cssText = 'font-size: 11px; white-space: pre-wrap; margin: 0; font-family: monospace; background: #eee; padding: 8px; border-radius: 3px;';
+                pre.textContent = JSON.stringify(item, null, 2);
+                container.appendChild(pre);
+                
+                propertiesPanel.appendChild(container);
             }
         }
-        propertiesPanel.innerHTML = content;
     };
 
     // Correct event listener using highlighter.events.select.onHighlight
