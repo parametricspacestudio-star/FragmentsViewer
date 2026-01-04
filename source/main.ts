@@ -91,6 +91,7 @@ async function init() {
 
     // 6. Set up Highlighter for selection
     const highlighter = components.get(OBCF.Highlighter);
+    highlighter.setup({ world });
     highlighter.zoomToSelection = true;
 
     // Clipper setup
@@ -155,133 +156,6 @@ async function init() {
         fragments.core.update(true)
     );
 
-    async function applyModernTheme() {
-        // 1. Apply CSS variables for the whole UI
-        const modernTheme = document.createElement('style');
-        modernTheme.textContent = `
-          :root {
-            /* Modern color palette - elegant dark theme */
-            --bim-ui_bg-base: #0f172a;          /* Base background - dark blue */
-            --bim-ui_bg-contrast-20: #1e293b;   /* Panel background */
-            --bim-ui_bg-contrast-40: #334155;   /* Section background */
-            --bim-ui_accent-base: #3b82f6;      /* Primary accent - bright blue */
-            --bim-ui_bg-accent: #1d4ed8;        /* Accent background */
-            --bim-ui_fg-base: #f8fafc;          /* Base text color */
-            
-            /* Modern typography */
-            --bim-ui_font-family: 'Inter', -apple-system, sans-serif;
-            --bim-ui_font-size-base: 14px;
-            
-            /* Enhanced spacing and effects */
-            --bim-ui_radius-lg: 12px;           /* Large rounded corners */
-            --bim-ui_radius-md: 8px;
-            --bim-ui_shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.3);
-          }
-
-          /* Modernize the panel and its sections */
-          bim-panel {
-            /* Glass morphism effect */
-            background: rgba(30, 41, 59, 0.85) !important;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: var(--bim-ui_shadow-lg);
-            border-radius: var(--bim-ui_radius-lg) !important;
-          }
-
-          /* Panel header styling */
-          bim-panel::part(header) {
-            padding: 20px 16px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            font-weight: 600;
-            letter-spacing: 0.5px;
-          }
-
-          /* Panel sections */
-          bim-panel-section {
-            margin: 8px 0;
-          }
-
-          bim-panel-section::part(header) {
-            color: #94a3b8;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            padding: 12px 16px;
-          }
-
-          /* Modern buttons */
-          bim-button::part(button) {
-            border-radius: var(--bim-ui_radius-md);
-            transition: all 0.2s ease;
-            padding: 10px 16px;
-            margin: 4px 0;
-          }
-
-          bim-button::part(button):hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-          }
-
-          /* Modern properties panel */
-          .modern-properties-panel {
-            background: rgba(30, 41, 59, 0.95) !important;
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 16px !important;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-            color: #f1f5f9 !important;
-            font-family: 'Inter', sans-serif;
-            padding: 0 !important;
-            overflow: hidden;
-          }
-          
-          .modern-drag-handle {
-            background: linear-gradient(90deg, #3b82f6, #8b5cf6) !important;
-            cursor: grab;
-            height: 4px !important;
-            border-radius: 2px;
-            margin: 12px auto;
-            width: 60px;
-          }
-          
-          .modern-summary-section {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
-            border-radius: 12px;
-            margin: 12px;
-            padding: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-          }
-          
-          .modern-detail-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 13px;
-          }
-        `;
-        document.head.appendChild(modernTheme);
-        
-        // 2. Update highlighter colors
-        highlighter.setup({ 
-            world,
-            selectionColor: new THREE.Color(0x3b82f6)    // Modern blue
-        });
-        
-        // 3. Update your custom panel
-        propertiesPanel.classList.add('modern-properties-panel');
-        dragHandle.className = 'modern-drag-handle';
-        dragHandle.innerHTML = ''; // Clear the old inner handle div as we use CSS styling now
-        
-        // 4. Load modern font
-        const fontLink = document.createElement('link');
-        fontLink.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap';
-        fontLink.rel = 'stylesheet';
-        document.head.appendChild(fontLink);
-        
-        console.log('Modern theme applied successfully');
-    }
-
     // 9. Handle model loading
     fragments.list.onItemSet.add(async ({ value: model }) => {
         model.useCamera(world.camera.three);
@@ -306,8 +180,6 @@ async function init() {
         metaDataTags: ['schema'],
         actions: { download: true },
     });
-
-    applyModernTheme();
 
     const [spatialTree] = BUIC.tables.spatialTree({
         components,
