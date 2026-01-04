@@ -7,19 +7,17 @@
         <meta name="robots" content="noindex">
 
     <title>Fragments Viewer</title>
-
+    
+    <!-- LOAD FONTS FIRST -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    
     <style>
-        /* Add modern fonts */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap'); 
-
         html, body {
             width: 100%;
             height: 100%;
-            font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', 'Segoe UI', sans-serif; /* Set default font */
             font-size: 16px;
             margin: 0px;
             padding: 0px;
@@ -33,39 +31,15 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-
-        /* Animation for smooth transitions */
-        bim-panel, bim-button, bim-checkbox, #properties-panel {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        }
         
-        /* Scrollbar styling */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.05);
-            border-radius: 3px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 3px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 0, 0, 0.2);
-        }
-
+        /* Keep only essential styles */
         .full-screen {
             width: 100%;
             height: 100%;
             overflow: hidden;
         }
         
-        .progress
-        {
+        .progress {
             background-color: #ffffff;
             text-align: center;
             width: 200px;
@@ -78,63 +52,17 @@
             box-shadow: 0px 0px 5px #cccccc;
             display: none;
         }
-
-        .sidebar {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            max-height: calc(100vh - 20px);
-            width: 350px;
-            z-index: 100;
-        }
-
+        
         bim-viewport {
             display: block;
             width: 100vw;
             height: 100vh;
         }
-
-        a
-        {
+        
+        a {
             color: #297fff;
             text-decoration: none;
             cursor: pointer;
-        }
-
-        .section
-        {
-            color: var(--bim-ui_bg-contrast-60);
-            font-size: var(--bim-ui_size-xs);            
-        }
-
-        .branding-title {
-            font-family: 'Orbitron', sans-serif !important;
-            font-weight: bold !important;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 1.5rem !important; /* Increased size */
-            letter-spacing: 2px;
-            color: #00e5ff !important; /* Electric Blue */
-            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
-        }
-
-        .branding-parameter {
-            color: #000000 !important;
-            font-weight: 500 !important;
-        }
-
-        .branding-space {
-            color: #00e5ff !important; /* Brighter Electric Blue */
-            font-weight: 900 !important;
-            text-transform: uppercase !important;
-        }
-
-        /* Override potential shadow DOM styles if needed */
-        bim-panel::part(label) {
-            font-family: 'Orbitron', sans-serif !important;
-            font-size: 1.5rem !important;
-            color: #00e5ff !important;
         }
     </style>
 </head>

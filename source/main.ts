@@ -7,231 +7,155 @@ import * as BUIC from '@thatopen/ui-obc';
 // Initialize UI libraries - must be done once per application
 BUI.Manager.init();
 
-// ================== ADD THIS CSS STYLING SECTION ==================
-const styleSheet = document.createElement('style');
-styleSheet.textContent = `
-  /* 1. MODERN THEME VARIABLES */
+// ================== CRITICAL: WORKING CSS STYLING ==================
+const style = document.createElement('style');
+style.textContent = `
+  /* 1. GLOBAL FONT SETUP - APPLIES TO EVERYTHING */
+  * {
+    font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  }
+  
+  /* 2. PANEL-SPECIFIC FONT OVERRIDES */
+  bim-panel, 
+  bim-panel *,
+  bim-panel::part(header),
+  bim-panel::part(label),
+  bim-panel-section::part(header),
+  bim-panel-section::part(label),
+  bim-button::part(button),
+  bim-button::part(label),
+  bim-checkbox::part(label),
+  bim-text-input::part(label),
+  bim-text-input::part(input) {
+    font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  }
+  
+  /* 3. FORCE FONT ON ALL THATOPEN UI COMPONENTS */
+  bim-panel, bim-button, bim-checkbox, bim-text-input, bim-dropdown,
+  bim-option, bim-table, bim-table-cell, bim-table-row {
+    font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  }
+  
+  /* 4. SPECIFIC PANEL HEADER FONT (Toolbar text) */
+  bim-panel.sidebar::part(header) {
+    font-family: 'Orbitron', 'Inter', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 1.4rem !important;
+    letter-spacing: 2px !important;
+    color: #0077FF !important;
+    text-shadow: 0 0 10px rgba(0, 119, 255, 0.3) !important;
+  }
+  
+  /* 5. PANEL SECTION HEADERS */
+  bim-panel-section::part(header) {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    color: #94a3b8 !important;
+    padding: 16px 20px 8px 20px !important;
+  }
+  
+  /* 6. BUTTON TEXT */
+  bim-button::part(button) {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 500 !important;
+    font-size: 0.95rem !important;
+  }
+  
+  /* 7. CRITICAL: CSS VARIABLES THAT ACTUALLY WORK */
   :root {
+    /* Core Theme Colors */
     --brand-blue: #0077FF;
-    --blue-light-bg: #EAF2FF;
-    --cream-bottom: #FAF9F7;
-    --panel-white: #FFFFFF;
-    --button-grey: #D1D6DB;
-    --button-hover: #BCC2C8;
-    --text-primary: #1F2937;
-    --text-secondary: #6B7280;
-    --text-disabled: #9CA3AF;
-    --border-divider: #E5E7EB;
-    --grid-lines: #D6DBE2;
-
-    /* Semantic Mappings */
     --modern-primary: var(--brand-blue);
     --modern-secondary: #0063D6;
     --modern-accent: var(--brand-blue);
-    --modern-dark: var(--cream-bottom);
-    --modern-darker: var(--panel-white);
-    --modern-light: var(--text-primary);
-    --modern-border: var(--border-divider);
+    --modern-dark: #FFFFFF;
+    --modern-darker: #FFFFFF;
+    --modern-border: #E5E7EB;
     
-    /* Override ThatOpen UI Variables */
-    --bim-ui_bg-base: var(--panel-white);
+    /* ThatOpen UI Variable Overrides */
+    --bim-ui_bg-base: #FFFFFF;
     --bim-ui_bg-contrast-20: #F3F4F6;
-    --bim-ui_bg-contrast-40: var(--border-divider);
+    --bim-ui_bg-contrast-40: var(--modern-border);
     --bim-ui_accent-base: var(--brand-blue);
-    --bim-ui_bg-accent: var(--blue-light-bg);
-    --bim-ui_fg-base: var(--text-primary);
+    --bim-ui_fg-base: #1F2937;
+    --bim-ui_bg-accent: #EAF2FF;
+    
+    /* Font Variables */
+    --bim-ui_font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    --bim-ui_font-size-base: 14px;
   }
-
-  /* 2. MODERN SIDEBAR PANEL STYLES */
+  
+  /* 8. PANEL COLORS & STYLES */
   bim-panel.sidebar {
-    background: var(--panel-white) !important;
-    border: 1px solid var(--border-divider) !important;
-    border-radius: 0 !important;
+    background: #FFFFFF !important;
+    border: 1px solid var(--modern-border) !important;
+    border-radius: 8px !important;
     box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
     overflow: hidden;
-    font-family: "Inter", system-ui, sans-serif !important;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
   }
-
+  
   bim-panel.sidebar::part(header) {
-    background: var(--panel-white) !important;
-    color: #111827 !important;
-    padding: 16px 20px !important;
-    font-family: "Inter", system-ui, sans-serif !important;
-    font-weight: 600 !important;
-    font-size: 13px !important;
-    line-height: 16px !important;
-    letter-spacing: 0.02em !important;
-    border-bottom: 1px solid var(--border-divider) !important;
+    background: #FFFFFF !important;
+    padding: 24px 20px !important;
+    border-bottom: 1px solid var(--modern-border);
   }
-
-  bim-panel-section::part(header) {
-    color: #111827 !important;
-    font-family: "Inter", system-ui, sans-serif !important;
-    font-size: 13px !important;
-    font-weight: 600 !important;
-    line-height: 16px !important;
-    letter-spacing: 0.02em !important;
-    padding: 16px 20px 8px 20px !important;
-    background: transparent !important;
-    border-top: 1px solid var(--border-divider);
-  }
-
-  bim-panel-section:first-of-type::part(header) {
-    border-top: none;
-  }
-
-  bim-panel-section::part(content) {
-    padding: 12px 20px !important;
-    background: transparent !important;
-  }
-
-  /* 3. BUTTON SYSTEM */
-  /* Secondary / Neutral (Default) */
+  
+  /* 9. BUTTON STYLES */
   bim-button::part(button) {
-    background: var(--button-grey) !important;
+    background: #D1D6DB !important;
     color: #2C2F33 !important;
     border: none !important;
     border-radius: 4px !important;
-    padding: 8px 16px !important;
-    margin: 4px 0 !important;
-    font-size: 13px !important;
-    font-weight: 500 !important;
-    line-height: 16px !important;
-    letter-spacing: 0.01em !important;
-    transition: background 0.2s ease !important;
-    text-align: left !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
+    padding: 14px 20px !important;
+    margin: 6px 0 !important;
+    transition: all 0.3s ease !important;
   }
-
+  
   bim-button::part(button):hover {
-    background: var(--button-hover) !important;
-    transform: none !important;
-    box-shadow: none !important;
+    background: #BCC2C8 !important;
+    transform: translateX(4px) !important;
   }
 
-  bim-button::part(button):active {
-    background: #AEB4BA !important;
-  }
-
-  /* Primary / Active (Blue is semantic) */
-  bim-button[active]::part(button),
-  bim-button.primary::part(button) {
+  bim-button[active]::part(button) {
     background: var(--brand-blue) !important;
     color: #FFFFFF !important;
   }
-
-  bim-button[active]::part(button):hover,
-  bim-button.primary::part(button):hover {
-    background: #0063D6 !important;
-  }
-
-  bim-button[disabled]::part(button) {
-    background: #A8CFFF !important;
-    color: var(--text-disabled) !important;
-    cursor: not-allowed !important;
-  }
-
-  /* 4. MODERN CHECKBOX STYLES */
-  bim-checkbox::part(container) {
-    border-radius: 4px !important;
-    border: none !important;
-    background: #C7CCD2 !important;
-    padding: 8px 16px !important;
-    margin: 4px 0 !important;
-    box-shadow: none !important;
-  }
-
-  bim-checkbox[value="true"]::part(container) {
-    background: var(--brand-blue) !important;
-  }
-
-  bim-checkbox::part(label) {
-    color: var(--text-secondary) !important;
-    font-size: 13px !important;
-    font-weight: 400 !important;
-  }
-
-  /* 5. MODERN INPUT STYLES */
-  bim-text-input::part(input) {
-    background: var(--panel-white) !important;
-    border: 1px solid var(--border-divider) !important;
-    border-radius: 4px !important;
-    color: var(--text-primary) !important;
-    padding: 8px 12px !important;
-    font-size: 13px !important;
-    font-weight: 400 !important;
-    box-shadow: none !important;
-  }
-
-  bim-text-input::part(input):focus {
-    border-color: var(--brand-blue) !important;
-    box-shadow: 0 0 0 2px rgba(0, 119, 255, 0.1) !important;
-  }
-
-  /* 6. MODERN DROPDOWN STYLES */
-  bim-dropdown::part(button) {
-    background: var(--panel-white) !important;
-    border: 1px solid var(--border-divider) !important;
-    border-radius: 4px !important;
-    color: var(--text-primary) !important;
-    padding: 8px 12px !important;
-    box-shadow: none !important;
-  }
-
-  bim-option::part(base) {
-    background: var(--panel-white) !important;
-    color: var(--text-primary) !important;
-    padding: 8px 12px !important;
-    font-size: 13px !important;
-  }
-
-  bim-option::part(base):hover {
-    background: var(--blue-light-bg) !important;
-    color: var(--brand-blue) !important;
-  }
-
-  /* 8. CUSTOM PROPERTIES PANEL MODERNIZATION */
-  #properties-panel.modern {
-    background: var(--panel-white) !important;
-    border: 1px solid var(--border-divider) !important;
-    border-radius: 8px !important;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
-    color: var(--text-primary) !important;
-    font-family: "Inter", system-ui, sans-serif !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-  }
-
-  .modern-drag-handle {
-    background: var(--border-divider) !important;
-    height: 4px !important;
-    border-radius: 2px !important;
-    margin: 12px auto !important;
-    width: 40px !important;
-  }
-
-  /* 9. MODERN COMPANY HEADING */
-  #company-heading.modern {
-    background: var(--panel-white) !important;
-    border: 1px solid var(--border-divider) !important;
-    border-radius: 4px !important;
-    padding: 8px 24px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
-  }
-
-  #company-heading.modern h1 {
-    color: var(--text-primary) !important;
-    font-size: 13px !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.02em !important;
-  }
 `;
-document.head.appendChild(styleSheet);
-// ================== END OF CSS STYLING SECTION ==================
+document.head.appendChild(style);
+
+// NUCLEAR OPTION: Direct shadow DOM manipulation for font
+function forcePanelStyles() {
+    const interval = setInterval(() => {
+        const elements = document.querySelectorAll('bim-panel, bim-button, bim-checkbox, bim-text-input, bim-dropdown');
+        
+        elements.forEach(el => {
+            if (el.shadowRoot) {
+                const styleId = 'forced-styles';
+                if (!el.shadowRoot.getElementById(styleId)) {
+                    const style = document.createElement('style');
+                    style.id = styleId;
+                    style.textContent = `
+                        * {
+                            font-family: 'Inter', sans-serif !important;
+                        }
+                    `;
+                    el.shadowRoot.appendChild(style);
+                }
+            }
+        });
+        
+        if (elements.length > 0) {
+            // Keep running for a bit to catch late-loading elements
+            setTimeout(() => clearInterval(interval), 5000);
+        }
+    }, 500);
+}
+
+forcePanelStyles();
+// ================== END OF CSS STYLING ==================
 
 // Progress bar for loading operations
 class ProgressBar {
@@ -358,7 +282,7 @@ async function init() {
                 } else if (modelName.includes('struct')) {
                     setHighlightColor(0xef4444); // Red for structural
                 } else {
-                    setHighlightColor(0x6366f1); // Default indigo
+                    setHighlightColor(0x0077FF); // Default brand blue
                 }
             }
         }
