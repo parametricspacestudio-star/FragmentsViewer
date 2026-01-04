@@ -13,14 +13,42 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
 
     <style>
+        /* Add modern fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Orbitron:wght@400;700&display=swap'); 
+
         html, body {
             width: 100%;
             height: 100%;
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             font-size: 16px;
             margin: 0px;
             padding: 0px;
             overflow: hidden;
+            background-color: #0f172a;
+        }
+
+        /* Animation for smooth transitions */
+        bim-panel, bim-button, bim-checkbox, #properties-panel {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.3);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.5);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.7);
         }
 
         .full-screen {

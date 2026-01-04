@@ -7,6 +7,205 @@ import * as BUIC from '@thatopen/ui-obc';
 // Initialize UI libraries - must be done once per application
 BUI.Manager.init();
 
+// ================== ADD THIS CSS STYLING SECTION ==================
+const styleSheet = document.createElement('style');
+styleSheet.textContent = `
+  /* 1. MODERN THEME VARIABLES */
+  :root {
+    --modern-primary: #6366f1;     /* Modern indigo */
+    --modern-secondary: #8b5cf6;   /* Modern violet */
+    --modern-accent: #0ea5e9;      /* Modern sky blue */
+    --modern-dark: #1e293b;        /* Dark slate */
+    --modern-darker: #0f172a;      /* Darker slate */
+    --modern-light: #f8fafc;       /* Off white */
+    --modern-border: rgba(255, 255, 255, 0.1);
+    
+    /* Override ThatOpen UI Variables */
+    --bim-ui_bg-base: var(--modern-darker);
+    --bim-ui_bg-contrast-20: var(--modern-dark);
+    --bim-ui_bg-contrast-40: #334155;
+    --bim-ui_accent-base: var(--modern-primary);
+    --bim-ui_bg-accent: rgba(99, 102, 241, 0.2);
+    --bim-ui_fg-base: #f1f5f9;
+  }
+
+  /* 2. MODERN SIDEBAR PANEL STYLES */
+  bim-panel.sidebar {
+    background: rgba(30, 41, 59, 0.95) !important;
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--modern-border) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+    overflow: hidden;
+  }
+
+  bim-panel.sidebar::part(header) {
+    background: linear-gradient(135deg, var(--modern-primary), var(--modern-secondary)) !important;
+    color: white !important;
+    padding: 24px 20px !important;
+    font-family: 'Orbitron', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 1.4rem !important;
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--modern-border);
+  }
+
+  bim-panel-section::part(header) {
+    color: #94a3b8 !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    padding: 16px 20px 8px 20px !important;
+    background: transparent !important;
+  }
+
+  bim-panel-section::part(content) {
+    padding: 12px 20px !important;
+    background: transparent !important;
+  }
+
+  /* 3. MODERN BUTTON STYLES */
+  bim-button::part(button) {
+    background: rgba(30, 41, 59, 0.8) !important;
+    color: #e2e8f0 !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 12px !important;
+    padding: 14px 20px !important;
+    margin: 6px 0 !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    text-align: left !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+  }
+
+  bim-button::part(button):hover {
+    background: rgba(99, 102, 241, 0.2) !important;
+    border-color: var(--modern-primary) !important;
+    transform: translateX(4px) !important;
+    box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.3) !important;
+  }
+
+  bim-button::part(button)[loading] {
+    opacity: 0.7 !important;
+    cursor: wait !important;
+  }
+
+  /* 4. MODERN CHECKBOX STYLES */
+  bim-checkbox::part(container) {
+    border-radius: 8px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    background: rgba(30, 41, 59, 0.6) !important;
+    padding: 14px 20px !important;
+    margin: 6px 0 !important;
+  }
+
+  bim-checkbox::part(label) {
+    color: #e2e8f0 !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+  }
+
+  /* 5. MODERN INPUT STYLES */
+  bim-text-input::part(input) {
+    background: rgba(30, 41, 59, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 12px !important;
+    color: #f1f5f9 !important;
+    padding: 14px 20px !important;
+    font-size: 15px !important;
+  }
+
+  bim-text-input::part(input):focus {
+    border-color: var(--modern-primary) !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+  }
+
+  /* 6. MODERN DROPDOWN STYLES */
+  bim-dropdown::part(button) {
+    background: rgba(30, 41, 59, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 12px !important;
+    color: #f1f5f9 !important;
+    padding: 14px 20px !important;
+  }
+
+  bim-option::part(base) {
+    background: rgba(30, 41, 59, 0.95) !important;
+    color: #f1f5f9 !important;
+    padding: 12px 20px !important;
+  }
+
+  bim-option::part(base):hover {
+    background: rgba(99, 102, 241, 0.2) !important;
+  }
+
+  /* 7. MODERN TABLES */
+  bim-table::part(table) {
+    background: transparent !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+  }
+
+  bim-table-row::part(row) {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  }
+
+  /* 8. CUSTOM PROPERTIES PANEL MODERNIZATION */
+  #properties-panel.modern {
+    background: rgba(30, 41, 59, 0.98) !important;
+    backdrop-filter: blur(30px) !important;
+    border: 1px solid var(--modern-border) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+    color: #f1f5f9 !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  #properties-panel.modern #properties-panel-content {
+    padding: 20px !important;
+    background: transparent !important;
+  }
+
+  .modern-drag-handle {
+    background: linear-gradient(90deg, var(--modern-primary), var(--modern-secondary)) !important;
+    height: 4px !important;
+    border-radius: 2px !important;
+    margin: 16px auto !important;
+    width: 60px !important;
+    cursor: grab !important;
+  }
+
+  .modern-drag-handle:active {
+    cursor: grabbing !important;
+  }
+
+  /* 9. MODERN COMPANY HEADING */
+  #company-heading.modern {
+    background: rgba(30, 41, 59, 0.9) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid var(--modern-border) !important;
+    border-radius: 16px !important;
+    padding: 12px 32px !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  #company-heading.modern h1 {
+    color: var(--modern-accent) !important;
+    font-size: 1.8rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 3px !important;
+    text-shadow: 0 0 20px rgba(14, 165, 233, 0.5) !important;
+  }
+`;
+document.head.appendChild(styleSheet);
+// ================== END OF CSS STYLING SECTION ==================
+
 // Progress bar for loading operations
 class ProgressBar {
     private progressDiv: HTMLElement;
@@ -89,10 +288,61 @@ async function init() {
     const fragments = components.get(OBC.FragmentsManager);
     fragments.init(workerObjectUrl);
 
-    // 6. Set up Highlighter for selection
+    // 6. Set up Highlighter for selection with CUSTOM COLORS
     const highlighter = components.get(OBCF.Highlighter);
-    highlighter.setup({ world });
-    highlighter.zoomToSelection = true;
+    highlighter.setup({ 
+        world,
+        // MODERN HIGHLIGHT COLORS
+        selectionColor: new THREE.Color(0x6366f1),  // Modern indigo
+        hoverColor: new THREE.Color(0x8b5cf6),   // Modern violet
+        outlineColor: new THREE.Color(0xffffff), // White outline
+        outlineWidth: 2,                         // Thicker outline
+        fillOpacity: 0.15,                       // Subtle fill
+        zoomToSelection: true
+    } as any);
+
+    // FUNCTION TO CHANGE HIGHLIGHT COLOR DYNAMICALLY
+    function setHighlightColor(colorHex: number) {
+        (highlighter as any).selectionColor.set(colorHex);
+    }
+
+    // FUNCTION TO CHANGE HOVER COLOR DYNAMICALLY
+    function setHoverColor(colorHex: number) {
+        (highlighter as any).hoverColor.set(colorHex);
+    }
+
+    // EXAMPLE: Color-coded highlighting by category
+    highlighter.events.select.onHighlight.add(async (modelIdMap: any) => {
+        // You can change highlight color based on what was selected
+        const firstModelId = Object.keys(modelIdMap)[0];
+        if (firstModelId) {
+            const model = fragments.list.get(firstModelId) as any;
+            if (model) {
+                // Example: Different colors for different model types
+                const modelName = model.modelId.toLowerCase();
+                if (modelName.includes('arch')) {
+                    setHighlightColor(0x10b981); // Emerald for architectural
+                } else if (modelName.includes('mep')) {
+                    setHighlightColor(0xf59e0b); // Amber for MEP
+                } else if (modelName.includes('struct')) {
+                    setHighlightColor(0xef4444); // Red for structural
+                } else {
+                    setHighlightColor(0x6366f1); // Default indigo
+                }
+            }
+        }
+        
+        const allElementData = [];
+        for (const [modelId, localIds] of Object.entries(modelIdMap)) {
+            const model = fragments.list.get(modelId) as any;
+            if (!model) continue;
+            if (model.getItemsData) {
+                const elementData = await model.getItemsData([...(localIds as Set<number>)]);
+                allElementData.push(...elementData);
+            }
+        }
+        displayElementData(allElementData);
+    });
 
     // Clipper setup
     const casters = components.get(OBC.Raycasters);
@@ -276,46 +526,31 @@ async function init() {
 
     const clearHighlights = async () => await highlighter.clear();
 
-    // Element Properties Component
+    // Element Properties Component - MODERN VERSION
     const propertiesPanel = document.createElement('div');
     propertiesPanel.id = 'properties-panel';
+    propertiesPanel.classList.add('modern'); // Add modern class
     propertiesPanel.style.display = 'none';
     propertiesPanel.style.position = 'fixed';
     propertiesPanel.style.top = '100px'; 
-    propertiesPanel.style.left = '20px'; // Initial position on the left
-    propertiesPanel.style.width = '300px';
-    propertiesPanel.style.maxHeight = 'calc(100vh - 120px)';
-    propertiesPanel.style.backgroundColor = 'white';
-    propertiesPanel.style.padding = '0'; // Padding moved to content
-    propertiesPanel.style.borderRadius = '8px';
-    propertiesPanel.style.boxShadow = '0 4px 20px rgba(0,0,0,0.3)';
+    propertiesPanel.style.left = '20px';
+    propertiesPanel.style.width = '340px'; // Slightly wider
+    propertiesPanel.style.maxHeight = 'calc(100vh - 140px)';
     propertiesPanel.style.zIndex = '1000';
     propertiesPanel.style.overflow = 'hidden';
-    propertiesPanel.style.color = 'black';
-    propertiesPanel.style.fontFamily = 'sans-serif';
     document.body.append(propertiesPanel);
 
-    // Draggable Header Handle
+    // Modern drag handle
     const dragHandle = document.createElement('div');
-    dragHandle.style.cssText = `
-        padding: 8px;
-        background: #f8f9fa;
-        border-bottom: 1px solid #eee;
-        cursor: move;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        user-select: none;
-    `;
-    dragHandle.innerHTML = '<div style="width: 30px; height: 4px; background: #ccc; border-radius: 2px;"></div>';
+    dragHandle.className = 'modern-drag-handle'; // Use class instead of inline styles
     propertiesPanel.appendChild(dragHandle);
 
     const panelContent = document.createElement('div');
     panelContent.id = 'properties-panel-content';
     panelContent.style.cssText = `
-        padding: 15px;
+        padding: 20px;
         overflow-y: auto;
-        max-height: calc(100vh - 140px);
+        max-height: calc(100vh - 160px);
     `;
     propertiesPanel.appendChild(panelContent);
 
@@ -365,99 +600,128 @@ async function init() {
         propertiesPanel.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
     };
 
-    // Main Logo/Heading
+    // Main Logo/Heading - MODERN VERSION
     const companyHeading = document.createElement('div');
     companyHeading.id = 'company-heading';
-    
-    const style = document.createElement('style');
-    style.textContent = `
-        #company-heading {
+    companyHeading.classList.add('modern'); // Add modern class
+
+    const headingStyle = document.createElement('style');
+    headingStyle.textContent = `
+        #company-heading.modern {
             position: fixed;
             z-index: 2000;
             pointer-events: none;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-family: 'Orbitron', sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(255, 255, 255, 0.7);
-            padding: 4px 10px; /* Reduced margin/padding */
-            border-radius: 4px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            backdrop-filter: blur(5px);
+            background: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 12px 32px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
 
-        #company-heading h1 {
+        #company-heading.modern h1 {
             margin: 0;
             font-weight: 700;
             text-transform: uppercase;
-            color: #333;
-            transition: all 0.4s ease;
+            color: #0ea5e9;
+            text-shadow: 0 0 20px rgba(14, 165, 233, 0.5);
             white-space: nowrap;
+            font-size: 1.8rem;
+            letter-spacing: 3px;
         }
 
         /* Desktop & Tablet */
         @media (min-width: 768px) {
-            #company-heading {
+            #company-heading.modern {
                 top: 20px;
                 left: 50%;
                 transform: translateX(-50%);
-                padding: 6px 20px; /* Reduced padding for smaller background */
+                padding: 12px 32px;
             }
-            #company-heading h1 {
-                font-size: 1.2rem; /* Slightly smaller than 1.5rem */
-                letter-spacing: 0.2em;
-            }
-            #properties-panel {
-                top: 100px !important;
-                left: 20px !important;
-                right: auto !important;
+            #company-heading.modern h1 {
+                font-size: 1.8rem;
             }
         }
 
         /* Phone */
         @media (max-width: 767px) {
-            #company-heading {
+            #company-heading.modern {
                 top: 15px;
                 left: 15px;
                 right: auto;
                 transform: none;
-                padding: 3px 6px; /* Even smaller padding */
+                padding: 8px 16px;
             }
-            #company-heading h1 {
-                font-size: 0.45rem; /* Slightly smaller than 0.5rem */
-                letter-spacing: 0.1em;
-            }
-            #properties-panel {
-                top: 80px !important;
-                left: 10px !important;
-                right: 10px !important;
-                width: calc(100% - 20px) !important;
-                max-height: calc(100vh - 100px) !important;
+            #company-heading.modern h1 {
+                font-size: 1rem;
+                letter-spacing: 2px;
             }
         }
     `;
-    document.head.appendChild(style);
-    
+    document.head.appendChild(headingStyle);
+
     const headingText = document.createElement('h1');
     headingText.textContent = 'PARAMETER SPACE';
-    
     companyHeading.appendChild(headingText);
     document.body.appendChild(companyHeading);
 
-    // Subtle animation for the "electric" pulse (Desktop only)
-    let frame = 0;
-    const animateHeading = () => {
-        if (window.innerWidth >= 768) {
-            frame += 0.05;
-            const pulse = Math.sin(frame) * 0.1 + 0.9;
-            headingText.style.opacity = pulse.toString();
-        } else {
-            headingText.style.opacity = '1';
-        }
-        requestAnimationFrame(animateHeading);
+    // MODERN COLOR PRESETS FOR HIGHLIGHTING
+    const highlightPresets = {
+        modernIndigo: 0x6366f1,
+        electricViolet: 0x8b5cf6,
+        skyBlue: 0x0ea5e9,
+        emerald: 0x10b981,
+        amber: 0xf59e0b,
+        rose: 0xf43f5e,
+        cyan: 0x06b6d4
     };
-    animateHeading();
+
+    // UI control to change highlight colors
+    function addHighlightColorControls() {
+        const colorControls = document.createElement('div');
+        colorControls.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 380px;
+            background: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            gap: 8px;
+            z-index: 100;
+        `;
+        
+        Object.entries(highlightPresets).forEach(([name, color]) => {
+            const btn = document.createElement('button');
+            btn.style.cssText = `
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                background: #${color.toString(16).padStart(6, '0')};
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                cursor: pointer;
+                transition: transform 0.2s;
+            `;
+            btn.title = `Set highlight to ${name}`;
+            (btn as any).onmouseenter = () => btn.style.transform = 'scale(1.1)';
+            (btn as any).onmouseleave = () => btn.style.transform = 'scale(1)';
+            btn.onclick = () => setHighlightColor(color);
+            colorControls.appendChild(btn);
+        });
+        
+        document.body.appendChild(colorControls);
+    }
+
+    // Call this after initialization
+    setTimeout(addHighlightColorControls, 1000);
+
 
     const toggleProperties = () => {
         propertiesPanel.style.display = propertiesPanel.style.display === 'none' ? 'block' : 'none';
