@@ -12,51 +12,50 @@ const styleSheet = document.createElement('style');
 styleSheet.textContent = `
   /* 1. MODERN THEME VARIABLES */
   :root {
-    --modern-primary: #6366f1;     /* Modern indigo */
-    --modern-secondary: #8b5cf6;   /* Modern violet */
-    --modern-accent: #0ea5e9;      /* Modern sky blue */
-    --modern-dark: #1e293b;        /* Dark slate */
-    --modern-darker: #0f172a;      /* Darker slate */
-    --modern-light: #f8fafc;       /* Off white */
-    --modern-border: rgba(255, 255, 255, 0.1);
+    --modern-primary: #0080FF;     /* Replit-like Blue */
+    --modern-secondary: #0066CC;   /* Darker Blue */
+    --modern-accent: #0080FF;
+    --modern-dark: #f5f5dc;        /* Cream */
+    --modern-darker: #fffdf5;      /* Lighter Cream */
+    --modern-light: #1e293b;       /* Dark text for light theme */
+    --modern-border: rgba(0, 0, 0, 0.1);
     
     /* Override ThatOpen UI Variables */
     --bim-ui_bg-base: var(--modern-darker);
     --bim-ui_bg-contrast-20: var(--modern-dark);
-    --bim-ui_bg-contrast-40: #334155;
+    --bim-ui_bg-contrast-40: #e2e2c7;
     --bim-ui_accent-base: var(--modern-primary);
-    --bim-ui_bg-accent: rgba(99, 102, 241, 0.2);
-    --bim-ui_fg-base: #f1f5f9;
+    --bim-ui_bg-accent: rgba(0, 128, 255, 0.1);
+    --bim-ui_fg-base: #1e293b;
   }
 
   /* 2. MODERN SIDEBAR PANEL STYLES */
   bim-panel.sidebar {
-    background: rgba(30, 41, 59, 0.95) !important;
+    background: rgba(255, 253, 245, 0.95) !important;
     backdrop-filter: blur(20px);
     border: 1px solid var(--modern-border) !important;
-    border-radius: 20px !important;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
     overflow: hidden;
+    font-family: 'Inter', sans-serif !important;
   }
 
   bim-panel.sidebar::part(header) {
-    background: linear-gradient(135deg, var(--modern-primary), var(--modern-secondary)) !important;
-    color: white !important;
-    padding: 24px 20px !important;
-    font-family: 'Orbitron', sans-serif !important;
+    background: #fdf5e6 !important;
+    color: #1e293b !important;
+    padding: 20px !important;
+    font-family: 'Inter', sans-serif !important;
     font-weight: 600 !important;
-    font-size: 1.4rem !important;
-    letter-spacing: 1px;
+    font-size: 1.2rem !important;
     border-bottom: 1px solid var(--modern-border);
   }
 
   bim-panel-section::part(header) {
-    color: #94a3b8 !important;
-    font-size: 13px !important;
+    color: #64748b !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 12px !important;
     font-weight: 600 !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
-    padding: 16px 20px 8px 20px !important;
     background: transparent !important;
   }
 
@@ -67,26 +66,27 @@ styleSheet.textContent = `
 
   /* 3. MODERN BUTTON STYLES */
   bim-button::part(button) {
-    background: rgba(30, 41, 59, 0.8) !important;
-    color: #e2e8f0 !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    border-radius: 12px !important;
+    background: #ffffff !important;
+    color: #1e293b !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    border-radius: 8px !important;
     padding: 14px 20px !important;
     margin: 6px 0 !important;
     font-size: 15px !important;
     font-weight: 500 !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition: all 0.2s ease !important;
     text-align: left !important;
     display: flex !important;
     align-items: center !important;
     gap: 12px !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
   }
 
   bim-button::part(button):hover {
-    background: rgba(99, 102, 241, 0.2) !important;
+    background: #f8fafc !important;
     border-color: var(--modern-primary) !important;
-    transform: translateX(4px) !important;
-    box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.3) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(0, 128, 255, 0.15) !important;
   }
 
   bim-button::part(button)[loading] {
@@ -97,72 +97,76 @@ styleSheet.textContent = `
   /* 4. MODERN CHECKBOX STYLES */
   bim-checkbox::part(container) {
     border-radius: 8px !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    background: rgba(30, 41, 59, 0.6) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    background: #ffffff !important;
     padding: 14px 20px !important;
     margin: 6px 0 !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
   }
 
   bim-checkbox::part(label) {
-    color: #e2e8f0 !important;
+    color: #1e293b !important;
     font-size: 15px !important;
     font-weight: 500 !important;
   }
 
   /* 5. MODERN INPUT STYLES */
   bim-text-input::part(input) {
-    background: rgba(30, 41, 59, 0.8) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    border-radius: 12px !important;
-    color: #f1f5f9 !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    border-radius: 8px !important;
+    color: #1e293b !important;
     padding: 14px 20px !important;
     font-size: 15px !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.05) !important;
   }
 
   bim-text-input::part(input):focus {
     border-color: var(--modern-primary) !important;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+    box-shadow: 0 0 0 3px rgba(0, 128, 255, 0.1) !important;
   }
 
   /* 6. MODERN DROPDOWN STYLES */
   bim-dropdown::part(button) {
-    background: rgba(30, 41, 59, 0.8) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    border-radius: 12px !important;
-    color: #f1f5f9 !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    border-radius: 8px !important;
+    color: #1e293b !important;
     padding: 14px 20px !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
   }
 
   bim-option::part(base) {
-    background: rgba(30, 41, 59, 0.95) !important;
-    color: #f1f5f9 !important;
+    background: #ffffff !important;
+    color: #1e293b !important;
     padding: 12px 20px !important;
   }
 
   bim-option::part(base):hover {
-    background: rgba(99, 102, 241, 0.2) !important;
+    background: #f8fafc !important;
+    color: var(--modern-primary) !important;
   }
 
   /* 7. MODERN TABLES */
   bim-table::part(table) {
     background: transparent !important;
-    border-radius: 12px !important;
+    border-radius: 8px !important;
     overflow: hidden !important;
   }
 
   bim-table-row::part(row) {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
   }
 
   /* 8. CUSTOM PROPERTIES PANEL MODERNIZATION */
   #properties-panel.modern {
-    background: rgba(30, 41, 59, 0.98) !important;
+    background: rgba(255, 253, 245, 0.98) !important;
     backdrop-filter: blur(30px) !important;
     border: 1px solid var(--modern-border) !important;
-    border-radius: 20px !important;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
-    color: #f1f5f9 !important;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    border-radius: 12px !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15) !important;
+    color: #1e293b !important;
+    font-family: 'Inter', sans-serif !important;
     padding: 0 !important;
     overflow: hidden !important;
   }
@@ -173,11 +177,11 @@ styleSheet.textContent = `
   }
 
   .modern-drag-handle {
-    background: linear-gradient(90deg, var(--modern-primary), var(--modern-secondary)) !important;
+    background: #e2e2c7 !important;
     height: 4px !important;
     border-radius: 2px !important;
-    margin: 16px auto !important;
-    width: 60px !important;
+    margin: 12px auto !important;
+    width: 40px !important;
     cursor: grab !important;
   }
 
@@ -187,20 +191,19 @@ styleSheet.textContent = `
 
   /* 9. MODERN COMPANY HEADING */
   #company-heading.modern {
-    background: rgba(30, 41, 59, 0.9) !important;
+    background: rgba(255, 253, 245, 0.9) !important;
     backdrop-filter: blur(20px) !important;
     border: 1px solid var(--modern-border) !important;
-    border-radius: 16px !important;
-    padding: 12px 32px !important;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
+    border-radius: 8px !important;
+    padding: 8px 24px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
   }
 
   #company-heading.modern h1 {
-    color: var(--modern-accent) !important;
-    font-size: 1.8rem !important;
+    color: #1e293b !important;
+    font-size: 1.5rem !important;
     font-weight: 700 !important;
-    letter-spacing: 3px !important;
-    text-shadow: 0 0 20px rgba(14, 165, 233, 0.5) !important;
+    letter-spacing: 2px !important;
   }
 `;
 document.head.appendChild(styleSheet);
@@ -292,12 +295,12 @@ async function init() {
     const highlighter = components.get(OBCF.Highlighter);
     highlighter.setup({ 
         world,
-        // MODERN HIGHLIGHT COLORS
-        selectionColor: new THREE.Color(0x6366f1),  // Modern indigo
-        hoverColor: new THREE.Color(0x8b5cf6),   // Modern violet
-        outlineColor: new THREE.Color(0xffffff), // White outline
-        outlineWidth: 2,                         // Thicker outline
-        fillOpacity: 0.15,                       // Subtle fill
+        // REPLIT BLUE HIGHLIGHT COLORS
+        selectionColor: new THREE.Color(0x0080FF), 
+        hoverColor: new THREE.Color(0x00A3FF),   
+        outlineColor: new THREE.Color(0x0080FF), 
+        outlineWidth: 2,                        
+        fillOpacity: 0.1,                       
         zoomToSelection: true
     } as any);
 
@@ -612,27 +615,26 @@ async function init() {
             z-index: 2000;
             pointer-events: none;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Inter', sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(30, 41, 59, 0.9);
+            background: rgba(255, 253, 245, 0.9);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 16px;
-            padding: 12px 32px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 8px 24px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
 
         #company-heading.modern h1 {
             margin: 0;
             font-weight: 700;
             text-transform: uppercase;
-            color: #0ea5e9;
-            text-shadow: 0 0 20px rgba(14, 165, 233, 0.5);
+            color: #1e293b;
             white-space: nowrap;
-            font-size: 1.8rem;
-            letter-spacing: 3px;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
         }
 
         /* Desktop & Tablet */
@@ -641,10 +643,6 @@ async function init() {
                 top: 20px;
                 left: 50%;
                 transform: translateX(-50%);
-                padding: 12px 32px;
-            }
-            #company-heading.modern h1 {
-                font-size: 1.8rem;
             }
         }
 
@@ -655,11 +653,11 @@ async function init() {
                 left: 15px;
                 right: auto;
                 transform: none;
-                padding: 8px 16px;
+                padding: 6px 16px;
             }
             #company-heading.modern h1 {
                 font-size: 1rem;
-                letter-spacing: 2px;
+                letter-spacing: 1px;
             }
         }
     `;
