@@ -12,51 +12,74 @@ const styleSheet = document.createElement('style');
 styleSheet.textContent = `
   /* 1. MODERN THEME VARIABLES */
   :root {
-    --modern-primary: #0080FF;     /* Replit-like Blue */
-    --modern-secondary: #0066CC;   /* Darker Blue */
-    --modern-accent: #0080FF;
-    --modern-dark: #f5f5dc;        /* Cream */
-    --modern-darker: #fffdf5;      /* Lighter Cream */
-    --modern-light: #1e293b;       /* Dark text for light theme */
-    --modern-border: rgba(0, 0, 0, 0.1);
+    --brand-blue: #0077FF;
+    --blue-light-bg: #EAF2FF;
+    --cream-bottom: #FAF9F7;
+    --panel-white: #FFFFFF;
+    --button-grey: #D1D6DB;
+    --button-hover: #BCC2C8;
+    --text-primary: #1F2937;
+    --text-secondary: #6B7280;
+    --text-disabled: #9CA3AF;
+    --border-divider: #E5E7EB;
+    --grid-lines: #D6DBE2;
+
+    /* Semantic Mappings */
+    --modern-primary: var(--brand-blue);
+    --modern-secondary: #0063D6;
+    --modern-accent: var(--brand-blue);
+    --modern-dark: var(--cream-bottom);
+    --modern-darker: var(--panel-white);
+    --modern-light: var(--text-primary);
+    --modern-border: var(--border-divider);
     
     /* Override ThatOpen UI Variables */
-    --bim-ui_bg-base: var(--modern-darker);
-    --bim-ui_bg-contrast-20: var(--modern-dark);
-    --bim-ui_bg-contrast-40: #e2e2c7;
-    --bim-ui_accent-base: var(--modern-primary);
-    --bim-ui_bg-accent: rgba(0, 128, 255, 0.1);
-    --bim-ui_fg-base: #1e293b;
+    --bim-ui_bg-base: var(--panel-white);
+    --bim-ui_bg-contrast-20: #F3F4F6;
+    --bim-ui_bg-contrast-40: var(--border-divider);
+    --bim-ui_accent-base: var(--brand-blue);
+    --bim-ui_bg-accent: var(--blue-light-bg);
+    --bim-ui_fg-base: var(--text-primary);
   }
 
   /* 2. MODERN SIDEBAR PANEL STYLES */
   bim-panel.sidebar {
-    background: rgba(255, 253, 245, 0.95) !important;
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--modern-border) !important;
-    border-radius: 12px !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+    background: var(--panel-white) !important;
+    border: 1px solid var(--border-divider) !important;
+    border-radius: 0 !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
     overflow: hidden;
-    font-family: 'Inter', sans-serif !important;
+    font-family: "Inter", system-ui, sans-serif !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   bim-panel.sidebar::part(header) {
-    background: #fdf5e6 !important;
-    color: #1e293b !important;
-    padding: 20px !important;
-    font-family: 'Inter', sans-serif !important;
+    background: var(--panel-white) !important;
+    color: #111827 !important;
+    padding: 16px 20px !important;
+    font-family: "Inter", system-ui, sans-serif !important;
     font-weight: 600 !important;
-    font-size: 1.2rem !important;
-    border-bottom: 1px solid var(--modern-border);
+    font-size: 13px !important;
+    line-height: 16px !important;
+    letter-spacing: 0.02em !important;
+    border-bottom: 1px solid var(--border-divider) !important;
   }
 
   bim-panel-section::part(header) {
-    color: #64748b !important;
-    font-family: 'Inter', sans-serif !important;
-    font-size: 12px !important;
+    color: #111827 !important;
+    font-family: "Inter", system-ui, sans-serif !important;
+    font-size: 13px !important;
     font-weight: 600 !important;
-    text-transform: uppercase !important;
+    line-height: 16px !important;
+    letter-spacing: 0.02em !important;
+    padding: 16px 20px 8px 20px !important;
     background: transparent !important;
+    border-top: 1px solid var(--border-divider);
+  }
+
+  bim-panel-section:first-of-type::part(header) {
+    border-top: none;
   }
 
   bim-panel-section::part(content) {
@@ -64,146 +87,147 @@ styleSheet.textContent = `
     background: transparent !important;
   }
 
-  /* 3. MODERN BUTTON STYLES */
+  /* 3. BUTTON SYSTEM */
+  /* Secondary / Neutral (Default) */
   bim-button::part(button) {
-    background: #ffffff !important;
-    color: #1e293b !important;
-    border: 1px solid rgba(0, 0, 0, 0.1) !important;
-    border-radius: 8px !important;
-    padding: 14px 20px !important;
-    margin: 6px 0 !important;
-    font-size: 15px !important;
+    background: var(--button-grey) !important;
+    color: #2C2F33 !important;
+    border: none !important;
+    border-radius: 4px !important;
+    padding: 8px 16px !important;
+    margin: 4px 0 !important;
+    font-size: 13px !important;
     font-weight: 500 !important;
-    transition: all 0.2s ease !important;
+    line-height: 16px !important;
+    letter-spacing: 0.01em !important;
+    transition: background 0.2s ease !important;
     text-align: left !important;
     display: flex !important;
     align-items: center !important;
-    gap: 12px !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+    gap: 8px !important;
   }
 
   bim-button::part(button):hover {
-    background: #f8fafc !important;
-    border-color: var(--modern-primary) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px rgba(0, 128, 255, 0.15) !important;
+    background: var(--button-hover) !important;
+    transform: none !important;
+    box-shadow: none !important;
   }
 
-  bim-button::part(button)[loading] {
-    opacity: 0.7 !important;
-    cursor: wait !important;
+  bim-button::part(button):active {
+    background: #AEB4BA !important;
+  }
+
+  /* Primary / Active (Blue is semantic) */
+  bim-button[active]::part(button),
+  bim-button.primary::part(button) {
+    background: var(--brand-blue) !important;
+    color: #FFFFFF !important;
+  }
+
+  bim-button[active]::part(button):hover,
+  bim-button.primary::part(button):hover {
+    background: #0063D6 !important;
+  }
+
+  bim-button[disabled]::part(button) {
+    background: #A8CFFF !important;
+    color: var(--text-disabled) !important;
+    cursor: not-allowed !important;
   }
 
   /* 4. MODERN CHECKBOX STYLES */
   bim-checkbox::part(container) {
-    border-radius: 8px !important;
-    border: 1px solid rgba(0, 0, 0, 0.1) !important;
-    background: #ffffff !important;
-    padding: 14px 20px !important;
-    margin: 6px 0 !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+    border-radius: 4px !important;
+    border: none !important;
+    background: #C7CCD2 !important;
+    padding: 8px 16px !important;
+    margin: 4px 0 !important;
+    box-shadow: none !important;
+  }
+
+  bim-checkbox[value="true"]::part(container) {
+    background: var(--brand-blue) !important;
   }
 
   bim-checkbox::part(label) {
-    color: #1e293b !important;
-    font-size: 15px !important;
-    font-weight: 500 !important;
+    color: var(--text-secondary) !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
   }
 
   /* 5. MODERN INPUT STYLES */
   bim-text-input::part(input) {
-    background: #ffffff !important;
-    border: 1px solid rgba(0, 0, 0, 0.1) !important;
-    border-radius: 8px !important;
-    color: #1e293b !important;
-    padding: 14px 20px !important;
-    font-size: 15px !important;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.05) !important;
+    background: var(--panel-white) !important;
+    border: 1px solid var(--border-divider) !important;
+    border-radius: 4px !important;
+    color: var(--text-primary) !important;
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    box-shadow: none !important;
   }
 
   bim-text-input::part(input):focus {
-    border-color: var(--modern-primary) !important;
-    box-shadow: 0 0 0 3px rgba(0, 128, 255, 0.1) !important;
+    border-color: var(--brand-blue) !important;
+    box-shadow: 0 0 0 2px rgba(0, 119, 255, 0.1) !important;
   }
 
   /* 6. MODERN DROPDOWN STYLES */
   bim-dropdown::part(button) {
-    background: #ffffff !important;
-    border: 1px solid rgba(0, 0, 0, 0.1) !important;
-    border-radius: 8px !important;
-    color: #1e293b !important;
-    padding: 14px 20px !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+    background: var(--panel-white) !important;
+    border: 1px solid var(--border-divider) !important;
+    border-radius: 4px !important;
+    color: var(--text-primary) !important;
+    padding: 8px 12px !important;
+    box-shadow: none !important;
   }
 
   bim-option::part(base) {
-    background: #ffffff !important;
-    color: #1e293b !important;
-    padding: 12px 20px !important;
+    background: var(--panel-white) !important;
+    color: var(--text-primary) !important;
+    padding: 8px 12px !important;
+    font-size: 13px !important;
   }
 
   bim-option::part(base):hover {
-    background: #f8fafc !important;
-    color: var(--modern-primary) !important;
-  }
-
-  /* 7. MODERN TABLES */
-  bim-table::part(table) {
-    background: transparent !important;
-    border-radius: 8px !important;
-    overflow: hidden !important;
-  }
-
-  bim-table-row::part(row) {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+    background: var(--blue-light-bg) !important;
+    color: var(--brand-blue) !important;
   }
 
   /* 8. CUSTOM PROPERTIES PANEL MODERNIZATION */
   #properties-panel.modern {
-    background: rgba(255, 253, 245, 0.98) !important;
-    backdrop-filter: blur(30px) !important;
-    border: 1px solid var(--modern-border) !important;
-    border-radius: 12px !important;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15) !important;
-    color: #1e293b !important;
-    font-family: 'Inter', sans-serif !important;
+    background: var(--panel-white) !important;
+    border: 1px solid var(--border-divider) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
+    color: var(--text-primary) !important;
+    font-family: "Inter", system-ui, sans-serif !important;
     padding: 0 !important;
     overflow: hidden !important;
   }
 
-  #properties-panel.modern #properties-panel-content {
-    padding: 20px !important;
-    background: transparent !important;
-  }
-
   .modern-drag-handle {
-    background: #e2e2c7 !important;
+    background: var(--border-divider) !important;
     height: 4px !important;
     border-radius: 2px !important;
     margin: 12px auto !important;
     width: 40px !important;
-    cursor: grab !important;
-  }
-
-  .modern-drag-handle:active {
-    cursor: grabbing !important;
   }
 
   /* 9. MODERN COMPANY HEADING */
   #company-heading.modern {
-    background: rgba(255, 253, 245, 0.9) !important;
-    backdrop-filter: blur(20px) !important;
-    border: 1px solid var(--modern-border) !important;
-    border-radius: 8px !important;
+    background: var(--panel-white) !important;
+    border: 1px solid var(--border-divider) !important;
+    border-radius: 4px !important;
     padding: 8px 24px !important;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
   }
 
   #company-heading.modern h1 {
-    color: #1e293b !important;
-    font-size: 1.5rem !important;
-    font-weight: 700 !important;
-    letter-spacing: 2px !important;
+    color: var(--text-primary) !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.02em !important;
   }
 `;
 document.head.appendChild(styleSheet);
@@ -277,7 +301,11 @@ async function init() {
     // 4. Initialize components and add grid
     components.init();
     const grids = components.get(OBC.Grids);
-    grids.create(world);
+    const grid = grids.create(world);
+    grid.config.color.set('#C2C9D1');
+    const gridMaterial = grid.three.material as THREE.LineBasicMaterial;
+    gridMaterial.transparent = true;
+    gridMaterial.opacity = 0.35;
 
     // 5. Set up FragmentsManager with local worker to avoid CORS issues
     const workerUrl = 'https://unpkg.com/@thatopen/fragments@3.2.13/dist/Worker/worker.mjs';
@@ -295,11 +323,11 @@ async function init() {
     const highlighter = components.get(OBCF.Highlighter);
     highlighter.setup({ 
         world,
-        // REPLIT BLUE HIGHLIGHT COLORS
-        selectionColor: new THREE.Color(0x0080FF), 
-        hoverColor: new THREE.Color(0x00A3FF),   
-        outlineColor: new THREE.Color(0x0080FF), 
-        outlineWidth: 2,                        
+        // BRAND BLUE HIGHLIGHT COLORS
+        selectionColor: new THREE.Color(0x0077FF), 
+        hoverColor: new THREE.Color(0x0063D6),   
+        outlineColor: new THREE.Color(0x0077FF), 
+        outlineWidth: 1.5,                        
         fillOpacity: 0.1,                       
         zoomToSelection: true
     } as any);
