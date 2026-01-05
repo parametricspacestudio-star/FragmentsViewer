@@ -7,129 +7,6 @@ import * as BUIC from '@thatopen/ui-obc';
 // Initialize UI libraries - must be done once per application
 BUI.Manager.init();
 
-// ================== CRITICAL: WORKING CSS STYLING ==================
-const style = document.createElement('style');
-style.textContent = `
-  /* 1. GLOBAL FONT SETUP - APPLIES TO EVERYTHING */
-  * {
-    font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif !important;
-  }
-  
-  /* 2. FORCE FONT AND COLORS ON ALL THATOPEN UI COMPONENTS */
-  bim-panel, bim-button, bim-checkbox, bim-text-input, bim-dropdown,
-  bim-option, bim-table, bim-table-cell, bim-table-row {
-    font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif !important;
-    --bim-ui_accent-base: #0077FF !important;
-    --bim-ui_bg-accent: rgba(0, 119, 255, 0.1) !important;
-  }
-  
-  /* 3. SPECIFIC PANEL HEADER FONT */
-  bim-panel.sidebar::part(header) {
-    font-family: 'Orbitron', 'Inter', sans-serif !important;
-    font-weight: 700 !important;
-    font-size: 1.4rem !important;
-    letter-spacing: 2px !important;
-    color: #0077FF !important;
-  }
-  
-  /* 4. CRITICAL: CSS VARIABLES FOR THATOPEN UI */
-  :root {
-    --brand-blue: #0077FF;
-    --bim-ui_accent-base: var(--brand-blue) !important;
-    --bim-ui_bg-accent: rgba(0, 119, 255, 0.1) !important;
-    --bim-ui_font-family: 'Inter', sans-serif !important;
-    
-    /* Remove bottom colors from theme vars */
-    --modern-primary: var(--brand-blue);
-    --modern-dark: #FFFFFF;
-    --modern-darker: #FFFFFF;
-    --modern-border: #E5E7EB;
-  }
-  
-  /* 5. PANEL COLORS & STYLES */
-  bim-panel.sidebar {
-    background: #FFFFFF !important;
-    border: 1px solid #E5E7EB !important;
-    border-radius: 8px !important;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
-  }
-  
-  bim-panel.sidebar::part(header) {
-    background: #FFFFFF !important;
-    border-bottom: 1px solid #E5E7EB !important;
-  }
-  
-  /* 6. BUTTON STYLES - REMOVE PURPLE */
-  bim-button::part(button) {
-    background: #D1D6DB !important;
-    color: #2C2F33 !important;
-    border: none !important;
-    border-radius: 4px !important;
-    transition: all 0.2s ease !important;
-  }
-  
-  bim-button::part(button):hover {
-    background: #BCC2C8 !important;
-  }
-
-  bim-button[active]::part(button) {
-    background: var(--brand-blue) !important;
-    color: #FFFFFF !important;
-  }
-
-  /* Force blue on specific internal parts that might be purple */
-  bim-checkbox::part(checkbox)[value="true"] {
-    background-color: var(--brand-blue) !important;
-  }
-`;
-document.head.appendChild(style);
-
-// NUCLEAR OPTION: Direct shadow DOM manipulation for font and colors
-function forcePanelStyles() {
-    const interval = setInterval(() => {
-        const elements = document.querySelectorAll('bim-panel, bim-button, bim-checkbox, bim-text-input, bim-dropdown, bim-table, bim-table-row, bim-table-cell');
-        
-        elements.forEach(el => {
-            if (el.shadowRoot) {
-                const styleId = 'forced-shadow-styles';
-                if (!el.shadowRoot.getElementById(styleId)) {
-                    const style = document.createElement('style');
-                    style.id = styleId;
-                    style.textContent = `
-                        * {
-                            font-family: 'Inter', sans-serif !important;
-                        }
-                        :host {
-                            --bim-ui_accent-base: #0077FF !important;
-                            --bim-ui_bg-accent: rgba(0, 119, 255, 0.1) !important;
-                            --bim-ui_font-family: 'Inter', sans-serif !important;
-                        }
-                        /* Target specific elements that might be purple */
-                        .active, [active], [value="true"] {
-                            background-color: #0077FF !important;
-                            color: white !important;
-                        }
-                        svg, .icon {
-                            fill: currentColor;
-                        }
-                        .selected {
-                           background-color: rgba(0, 119, 255, 0.1) !important;
-                        }
-                    `;
-                    el.shadowRoot.appendChild(style);
-                }
-            }
-        });
-        
-        if (elements.length > 0) {
-            setTimeout(() => clearInterval(interval), 10000);
-        }
-    }, 500);
-}
-
-forcePanelStyles();
-// ================== END OF CSS STYLING ==================
-
 // Progress bar for loading operations
 class ProgressBar {
     private progressDiv: HTMLElement;
@@ -198,11 +75,7 @@ async function init() {
     // 4. Initialize components and add grid
     components.init();
     const grids = components.get(OBC.Grids);
-    const grid = grids.create(world);
-    grid.config.color.set('#C2C9D1');
-    const gridMaterial = grid.three.material as THREE.LineBasicMaterial;
-    gridMaterial.transparent = true;
-    gridMaterial.opacity = 0.35;
+    grids.create(world);
 
     // 5. Set up FragmentsManager with local worker to avoid CORS issues
     const workerUrl = 'https://unpkg.com/@thatopen/fragments@3.2.13/dist/Worker/worker.mjs';
@@ -216,44 +89,10 @@ async function init() {
     const fragments = components.get(OBC.FragmentsManager);
     fragments.init(workerObjectUrl);
 
-    // 6. Set up Highlighter for selection with CUSTOM COLORS
+    // 6. Set up Highlighter for selection
     const highlighter = components.get(OBCF.Highlighter);
-    highlighter.setup({ 
-        world,
-        // BRAND BLUE HIGHLIGHT COLORS (TRANSPARENT BLUE)
-        selectionColor: new THREE.Color(0x0077FF), 
-        hoverColor: new THREE.Color(0x0063D6),   
-        outlineColor: new THREE.Color(0x0077FF), 
-        outlineWidth: 1.5,                        
-        fillOpacity: 0.15,                       
-        zoomToSelection: true
-    } as any);
-
-    // FUNCTION TO CHANGE HIGHLIGHT COLOR DYNAMICALLY
-    function setHighlightColor(colorHex: number) {
-        (highlighter as any).selectionColor.set(colorHex);
-    }
-
-    // FUNCTION TO CHANGE HOVER COLOR DYNAMICALLY
-    function setHoverColor(colorHex: number) {
-        (highlighter as any).hoverColor.set(colorHex);
-    }
-
-    // Default selection behavior - STICK TO BRAND BLUE
-    highlighter.events.select.onHighlight.add(async (modelIdMap: any) => {
-        setHighlightColor(0x0077FF); // Always use Brand Blue
-        
-        const allElementData = [];
-        for (const [modelId, localIds] of Object.entries(modelIdMap)) {
-            const model = fragments.list.get(modelId) as any;
-            if (!model) continue;
-            if (model.getItemsData) {
-                const elementData = await model.getItemsData([...(localIds as Set<number>)]);
-                allElementData.push(...elementData);
-            }
-        }
-        displayElementData(allElementData);
-    });
+    highlighter.setup({ world });
+    highlighter.zoomToSelection = true;
 
     // Clipper setup
     const casters = components.get(OBC.Raycasters);
@@ -437,31 +276,46 @@ async function init() {
 
     const clearHighlights = async () => await highlighter.clear();
 
-    // Element Properties Component - MODERN VERSION
+    // Element Properties Component
     const propertiesPanel = document.createElement('div');
     propertiesPanel.id = 'properties-panel';
-    propertiesPanel.classList.add('modern'); // Add modern class
     propertiesPanel.style.display = 'none';
     propertiesPanel.style.position = 'fixed';
     propertiesPanel.style.top = '100px'; 
-    propertiesPanel.style.left = '20px';
-    propertiesPanel.style.width = '340px'; // Slightly wider
-    propertiesPanel.style.maxHeight = 'calc(100vh - 140px)';
+    propertiesPanel.style.left = '20px'; // Initial position on the left
+    propertiesPanel.style.width = '300px';
+    propertiesPanel.style.maxHeight = 'calc(100vh - 120px)';
+    propertiesPanel.style.backgroundColor = 'white';
+    propertiesPanel.style.padding = '0'; // Padding moved to content
+    propertiesPanel.style.borderRadius = '8px';
+    propertiesPanel.style.boxShadow = '0 4px 20px rgba(0,0,0,0.3)';
     propertiesPanel.style.zIndex = '1000';
     propertiesPanel.style.overflow = 'hidden';
+    propertiesPanel.style.color = 'black';
+    propertiesPanel.style.fontFamily = 'sans-serif';
     document.body.append(propertiesPanel);
 
-    // Modern drag handle
+    // Draggable Header Handle
     const dragHandle = document.createElement('div');
-    dragHandle.className = 'modern-drag-handle'; // Use class instead of inline styles
+    dragHandle.style.cssText = `
+        padding: 8px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #eee;
+        cursor: move;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        user-select: none;
+    `;
+    dragHandle.innerHTML = '<div style="width: 30px; height: 4px; background: #ccc; border-radius: 2px;"></div>';
     propertiesPanel.appendChild(dragHandle);
 
     const panelContent = document.createElement('div');
     panelContent.id = 'properties-panel-content';
     panelContent.style.cssText = `
-        padding: 20px;
+        padding: 15px;
         overflow-y: auto;
-        max-height: calc(100vh - 160px);
+        max-height: calc(100vh - 140px);
     `;
     propertiesPanel.appendChild(panelContent);
 
@@ -511,123 +365,99 @@ async function init() {
         propertiesPanel.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
     };
 
-    // Main Logo/Heading - MODERN VERSION
+    // Main Logo/Heading
     const companyHeading = document.createElement('div');
     companyHeading.id = 'company-heading';
-    companyHeading.classList.add('modern'); // Add modern class
-
-    const headingStyle = document.createElement('style');
-    headingStyle.textContent = `
-        #company-heading.modern {
+    
+    const style = document.createElement('style');
+    style.textContent = `
+        #company-heading {
             position: fixed;
             z-index: 2000;
             pointer-events: none;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-family: 'Inter', sans-serif;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(255, 253, 245, 0.9);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            padding: 8px 24px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.7);
+            padding: 4px 10px; /* Reduced margin/padding */
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            backdrop-filter: blur(5px);
         }
 
-        #company-heading.modern h1 {
+        #company-heading h1 {
             margin: 0;
             font-weight: 700;
             text-transform: uppercase;
-            color: #1e293b;
+            color: #333;
+            transition: all 0.4s ease;
             white-space: nowrap;
-            font-size: 1.5rem;
-            letter-spacing: 2px;
         }
 
         /* Desktop & Tablet */
         @media (min-width: 768px) {
-            #company-heading.modern {
+            #company-heading {
                 top: 20px;
                 left: 50%;
                 transform: translateX(-50%);
+                padding: 6px 20px; /* Reduced padding for smaller background */
+            }
+            #company-heading h1 {
+                font-size: 1.2rem; /* Slightly smaller than 1.5rem */
+                letter-spacing: 0.2em;
+            }
+            #properties-panel {
+                top: 100px !important;
+                left: 20px !important;
+                right: auto !important;
             }
         }
 
         /* Phone */
         @media (max-width: 767px) {
-            #company-heading.modern {
+            #company-heading {
                 top: 15px;
                 left: 15px;
                 right: auto;
                 transform: none;
-                padding: 6px 16px;
+                padding: 3px 6px; /* Even smaller padding */
             }
-            #company-heading.modern h1 {
-                font-size: 1rem;
-                letter-spacing: 1px;
+            #company-heading h1 {
+                font-size: 0.45rem; /* Slightly smaller than 0.5rem */
+                letter-spacing: 0.1em;
+            }
+            #properties-panel {
+                top: 80px !important;
+                left: 10px !important;
+                right: 10px !important;
+                width: calc(100% - 20px) !important;
+                max-height: calc(100vh - 100px) !important;
             }
         }
     `;
-    document.head.appendChild(headingStyle);
-
+    document.head.appendChild(style);
+    
     const headingText = document.createElement('h1');
     headingText.textContent = 'PARAMETER SPACE';
+    
     companyHeading.appendChild(headingText);
     document.body.appendChild(companyHeading);
 
-    // MODERN COLOR PRESETS FOR HIGHLIGHTING
-    const highlightPresets = {
-        modernIndigo: 0x6366f1,
-        electricViolet: 0x8b5cf6,
-        skyBlue: 0x0ea5e9,
-        emerald: 0x10b981,
-        amber: 0xf59e0b,
-        rose: 0xf43f5e,
-        cyan: 0x06b6d4
+    // Subtle animation for the "electric" pulse (Desktop only)
+    let frame = 0;
+    const animateHeading = () => {
+        if (window.innerWidth >= 768) {
+            frame += 0.05;
+            const pulse = Math.sin(frame) * 0.1 + 0.9;
+            headingText.style.opacity = pulse.toString();
+        } else {
+            headingText.style.opacity = '1';
+        }
+        requestAnimationFrame(animateHeading);
     };
-
-    // UI control to change highlight colors
-    function addHighlightColorControls() {
-        const colorControls = document.createElement('div');
-        colorControls.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            right: 380px;
-            background: rgba(30, 41, 59, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
-            padding: 15px;
-            display: flex;
-            gap: 8px;
-            z-index: 100;
-        `;
-        
-        Object.entries(highlightPresets).forEach(([name, color]) => {
-            const btn = document.createElement('button');
-            btn.style.cssText = `
-                width: 30px;
-                height: 30px;
-                border-radius: 50%;
-                background: #${color.toString(16).padStart(6, '0')};
-                border: 2px solid rgba(255, 255, 255, 0.3);
-                cursor: pointer;
-                transition: transform 0.2s;
-            `;
-            btn.title = `Set highlight to ${name}`;
-            (btn as any).onmouseenter = () => btn.style.transform = 'scale(1.1)';
-            (btn as any).onmouseleave = () => btn.style.transform = 'scale(1)';
-            btn.onclick = () => setHighlightColor(color);
-            colorControls.appendChild(btn);
-        });
-        
-        document.body.appendChild(colorControls);
-    }
-
-    // Call this after initialization
-    setTimeout(addHighlightColorControls, 1000);
-
+    animateHeading();
 
     const toggleProperties = () => {
         propertiesPanel.style.display = propertiesPanel.style.display === 'none' ? 'block' : 'none';
