@@ -239,26 +239,9 @@ async function init() {
         (highlighter as any).hoverColor.set(colorHex);
     }
 
-    // EXAMPLE: Color-coded highlighting by category
+    // Default selection behavior - STICK TO BRAND BLUE
     highlighter.events.select.onHighlight.add(async (modelIdMap: any) => {
-        // You can change highlight color based on what was selected
-        const firstModelId = Object.keys(modelIdMap)[0];
-        if (firstModelId) {
-            const model = fragments.list.get(firstModelId) as any;
-            if (model) {
-                // Example: Different colors for different model types
-                const modelName = model.modelId.toLowerCase();
-                if (modelName.includes('arch')) {
-                    setHighlightColor(0x10b981); // Emerald for architectural
-                } else if (modelName.includes('mep')) {
-                    setHighlightColor(0xf59e0b); // Amber for MEP
-                } else if (modelName.includes('struct')) {
-                    setHighlightColor(0xef4444); // Red for structural
-                } else {
-                    setHighlightColor(0x0077FF); // Default brand blue
-                }
-            }
-        }
+        setHighlightColor(0x0077FF); // Always use Brand Blue
         
         const allElementData = [];
         for (const [modelId, localIds] of Object.entries(modelIdMap)) {
