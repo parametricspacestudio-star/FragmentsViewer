@@ -15,131 +15,105 @@ style.textContent = `
     font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif !important;
   }
   
-  /* 2. PANEL-SPECIFIC FONT OVERRIDES */
-  bim-panel, 
-  bim-panel *,
-  bim-panel::part(header),
-  bim-panel::part(label),
-  bim-panel-section::part(header),
-  bim-panel-section::part(label),
-  bim-button::part(button),
-  bim-button::part(label),
-  bim-checkbox::part(label),
-  bim-text-input::part(label),
-  bim-text-input::part(input) {
-    font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif !important;
-  }
-  
-  /* 3. FORCE FONT ON ALL THATOPEN UI COMPONENTS */
+  /* 2. FORCE FONT AND COLORS ON ALL THATOPEN UI COMPONENTS */
   bim-panel, bim-button, bim-checkbox, bim-text-input, bim-dropdown,
   bim-option, bim-table, bim-table-cell, bim-table-row {
     font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    --bim-ui_accent-base: #0077FF !important;
+    --bim-ui_bg-accent: rgba(0, 119, 255, 0.1) !important;
   }
   
-  /* 4. SPECIFIC PANEL HEADER FONT (Toolbar text) */
+  /* 3. SPECIFIC PANEL HEADER FONT */
   bim-panel.sidebar::part(header) {
     font-family: 'Orbitron', 'Inter', sans-serif !important;
     font-weight: 700 !important;
     font-size: 1.4rem !important;
     letter-spacing: 2px !important;
     color: #0077FF !important;
-    text-shadow: 0 0 10px rgba(0, 119, 255, 0.3) !important;
   }
   
-  /* 5. PANEL SECTION HEADERS */
-  bim-panel-section::part(header) {
-    font-family: 'Inter', sans-serif !important;
-    font-weight: 600 !important;
-    font-size: 0.9rem !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
-    color: #94a3b8 !important;
-    padding: 16px 20px 8px 20px !important;
-  }
-  
-  /* 6. BUTTON TEXT */
-  bim-button::part(button) {
-    font-family: 'Inter', sans-serif !important;
-    font-weight: 500 !important;
-    font-size: 0.95rem !important;
-  }
-  
-  /* 7. CRITICAL: CSS VARIABLES THAT ACTUALLY WORK */
+  /* 4. CRITICAL: CSS VARIABLES FOR THATOPEN UI */
   :root {
-    /* Core Theme Colors */
     --brand-blue: #0077FF;
+    --bim-ui_accent-base: var(--brand-blue) !important;
+    --bim-ui_bg-accent: rgba(0, 119, 255, 0.1) !important;
+    --bim-ui_font-family: 'Inter', sans-serif !important;
+    
+    /* Remove bottom colors from theme vars */
     --modern-primary: var(--brand-blue);
-    --modern-secondary: #0063D6;
-    --modern-accent: var(--brand-blue);
     --modern-dark: #FFFFFF;
     --modern-darker: #FFFFFF;
     --modern-border: #E5E7EB;
-    
-    /* ThatOpen UI Variable Overrides */
-    --bim-ui_bg-base: #FFFFFF;
-    --bim-ui_bg-contrast-20: #F3F4F6;
-    --bim-ui_bg-contrast-40: var(--modern-border);
-    --bim-ui_accent-base: var(--brand-blue);
-    --bim-ui_fg-base: #1F2937;
-    --bim-ui_bg-accent: #EAF2FF;
-    
-    /* Font Variables */
-    --bim-ui_font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-    --bim-ui_font-size-base: 14px;
   }
   
-  /* 8. PANEL COLORS & STYLES */
+  /* 5. PANEL COLORS & STYLES */
   bim-panel.sidebar {
     background: #FFFFFF !important;
-    border: 1px solid var(--modern-border) !important;
+    border: 1px solid #E5E7EB !important;
     border-radius: 8px !important;
     box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
-    overflow: hidden;
   }
   
   bim-panel.sidebar::part(header) {
     background: #FFFFFF !important;
-    padding: 24px 20px !important;
-    border-bottom: 1px solid var(--modern-border);
+    border-bottom: 1px solid #E5E7EB !important;
   }
   
-  /* 9. BUTTON STYLES */
+  /* 6. BUTTON STYLES - REMOVE PURPLE */
   bim-button::part(button) {
     background: #D1D6DB !important;
     color: #2C2F33 !important;
     border: none !important;
     border-radius: 4px !important;
-    padding: 14px 20px !important;
-    margin: 6px 0 !important;
-    transition: all 0.3s ease !important;
+    transition: all 0.2s ease !important;
   }
   
   bim-button::part(button):hover {
     background: #BCC2C8 !important;
-    transform: translateX(4px) !important;
   }
 
   bim-button[active]::part(button) {
     background: var(--brand-blue) !important;
     color: #FFFFFF !important;
   }
+
+  /* Force blue on specific internal parts that might be purple */
+  bim-checkbox::part(checkbox)[value="true"] {
+    background-color: var(--brand-blue) !important;
+  }
 `;
 document.head.appendChild(style);
 
-// NUCLEAR OPTION: Direct shadow DOM manipulation for font
+// NUCLEAR OPTION: Direct shadow DOM manipulation for font and colors
 function forcePanelStyles() {
     const interval = setInterval(() => {
-        const elements = document.querySelectorAll('bim-panel, bim-button, bim-checkbox, bim-text-input, bim-dropdown');
+        const elements = document.querySelectorAll('bim-panel, bim-button, bim-checkbox, bim-text-input, bim-dropdown, bim-table, bim-table-row, bim-table-cell');
         
         elements.forEach(el => {
             if (el.shadowRoot) {
-                const styleId = 'forced-styles';
+                const styleId = 'forced-shadow-styles';
                 if (!el.shadowRoot.getElementById(styleId)) {
                     const style = document.createElement('style');
                     style.id = styleId;
                     style.textContent = `
                         * {
                             font-family: 'Inter', sans-serif !important;
+                        }
+                        :host {
+                            --bim-ui_accent-base: #0077FF !important;
+                            --bim-ui_bg-accent: rgba(0, 119, 255, 0.1) !important;
+                            --bim-ui_font-family: 'Inter', sans-serif !important;
+                        }
+                        /* Target specific elements that might be purple */
+                        .active, [active], [value="true"] {
+                            background-color: #0077FF !important;
+                            color: white !important;
+                        }
+                        svg, .icon {
+                            fill: currentColor;
+                        }
+                        .selected {
+                           background-color: rgba(0, 119, 255, 0.1) !important;
                         }
                     `;
                     el.shadowRoot.appendChild(style);
@@ -148,8 +122,7 @@ function forcePanelStyles() {
         });
         
         if (elements.length > 0) {
-            // Keep running for a bit to catch late-loading elements
-            setTimeout(() => clearInterval(interval), 5000);
+            setTimeout(() => clearInterval(interval), 10000);
         }
     }, 500);
 }
@@ -247,12 +220,12 @@ async function init() {
     const highlighter = components.get(OBCF.Highlighter);
     highlighter.setup({ 
         world,
-        // BRAND BLUE HIGHLIGHT COLORS
+        // BRAND BLUE HIGHLIGHT COLORS (TRANSPARENT BLUE)
         selectionColor: new THREE.Color(0x0077FF), 
         hoverColor: new THREE.Color(0x0063D6),   
         outlineColor: new THREE.Color(0x0077FF), 
         outlineWidth: 1.5,                        
-        fillOpacity: 0.1,                       
+        fillOpacity: 0.15,                       
         zoomToSelection: true
     } as any);
 
